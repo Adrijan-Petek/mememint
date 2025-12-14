@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter, Source_Code_Pro } from "next/font/google";
-import { SafeArea } from "@coinbase/onchainkit/minikit";
 import { minikitConfig } from "@/minikit.config";
 import { RootProvider } from "./rootProvider";
 import { SplashScreenProvider } from "./components/SplashScreenContext";
@@ -52,11 +51,9 @@ export default function RootLayout({
       <SplashScreenProvider>
         <html lang="en">
           <body className={`${inter.variable} ${sourceCodePro.variable}`}>
-            <SafeArea>
-              <MiniAppLoader />
-              <NetworkChecker />
-              <AppWrapper>{children}</AppWrapper>
-            </SafeArea>
+            <MiniAppLoader />
+            <NetworkChecker />
+            <AppWrapper>{children}</AppWrapper>
           </body>
         </html>
       </SplashScreenProvider>

@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState, useRef } from "react";
 import Image from "next/image";
-import styles from "./MemeGenerator_new.module.css";
 import { useMemeGeneration } from "../hooks/useMemeGeneration";
 import { useTemplates } from "../hooks/useTemplates";
 import { useMinting } from "../hooks/useMinting";
@@ -152,16 +151,16 @@ export default function MemeGenerator({ onShowAdminDashboard: _ }: MemeGenerator
   const displayImageUrl = generatedMeme ?? (texts.some(t => t.trim()) ? previewUrl : selectedTemplate?.url) ?? null;
 
   return (
-    <div className={styles.memeCard}>
+    <div className="w-full max-w-[700px] mx-auto bg-[rgba(18,18,18,0.95)] border border-blue-400/20 rounded-xl backdrop-blur-[20px] shadow-[0_8px_32px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col min-h-[calc(100vh-10px)] max-h-[calc(100vh-10px)]">
       {/* Header */}
-      <div className={styles.cardHeader}>
-        <h1 className={styles.cardTitle}>MemeMint – Create Meme</h1>
+      <div className="p-4 pb-0 border-b border-blue-400/10">
+        <h1 className="text-xl font-bold bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent m-0 text-center">MemeMint – Create Meme</h1>
       </div>
 
       {/* Preview Section */}
-      <section className={styles.previewSection}>
-        <div className={styles.preview}>
-          <div className={styles.imageContainer}>
+      <section className="p-4 flex flex-col gap-2">
+        <div className="flex justify-center items-center bg-white/2 rounded-lg p-2 min-h-[250px]">
+          <div className="relative w-full h-full min-h-[200px]">
             {displayImageUrl ? (
               <Image
                 src={displayImageUrl}
@@ -173,7 +172,7 @@ export default function MemeGenerator({ onShowAdminDashboard: _ }: MemeGenerator
                 unoptimized
               />
             ) : (
-              <div className={styles.placeholder}>
+              <div className="flex items-center justify-center w-full h-full text-gray-400">
                 <span>Select a template to start</span>
               </div>
             )}
@@ -181,9 +180,9 @@ export default function MemeGenerator({ onShowAdminDashboard: _ }: MemeGenerator
         </div>
 
         {selectedTemplate && (
-          <div className={styles.templateInfo}>
-            <span className={styles.templateName}>{selectedTemplate.name}</span>
-            <span className={styles.templateSize}>
+          <div className="flex justify-between items-center text-sm text-gray-300">
+            <span className="font-medium">{selectedTemplate.name}</span>
+            <span className="text-gray-400">
               {selectedTemplate.width}×{selectedTemplate.height}
             </span>
           </div>
@@ -191,51 +190,54 @@ export default function MemeGenerator({ onShowAdminDashboard: _ }: MemeGenerator
       </section>
 
       {/* Controls Section */}
-      <section className={styles.controlsSection}>
+      <section className="flex-1 px-4 pb-4 flex flex-col gap-4 overflow-y-auto">
         {/* Template Selection */}
-        <div className={styles.templateSection}>
-          <label className={styles.sectionLabel}>Template</label>
+        <div className="flex flex-col gap-2">
+          <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider block mb-1">Template</label>
 
-          <div className={styles.carouselContainer}>
+          <div className="relative flex items-center">
             <button
               type="button"
-              className={`${styles.scrollBtn} ${styles.scrollLeft}`}
+              className="absolute left-0 z-10 bg-gray-800/80 hover:bg-gray-700/80 text-white px-2 py-1 rounded border border-gray-600/50 hover:border-gray-500/50 transition-colors"
               onClick={() => scrollTemplates('left')}
               aria-label="Scroll templates left"
             >
               ◀
             </button>
 
-            <div className={styles.templatesCarousel} ref={templatesRef}>
-              {templates.map((template, index) => (
-                <button
-                  type="button"
-                  key={`${template.id}-${index}`}
-                  className={`${styles.templateCard} ${
-                    selectedTemplate?.id === template.id ? styles.selected : ""
-                  }`}
-                  onClick={() => selectTemplate(template.id)}
-                >
-                  <div className={styles.imageWrapper}>
-                    <Image
-                      src={template.url}
-                      alt={template.name}
-                      width={80}
-                      height={60}
-                      style={{ objectFit: "cover", width: "100%", height: "100%" }}
-                      unoptimized
-                    />
-                  </div>
-                  <div className={styles.templateName}>
-                    {template.name.length > 12 ? `${template.name.substring(0, 12)}...` : template.name}
-                  </div>
-                </button>
-              ))}
+            <div className="flex-1 mx-8 overflow-x-auto scrollbar-hide" ref={templatesRef}>
+              <div className="flex gap-2 pb-2">
+                {templates.map((template, index) => (
+                  <button
+                    type="button"
+                    key={`${template.id}-${index}`}
+                    className={`flex-shrink-0 w-20 h-16 rounded-lg border-2 overflow-hidden transition-all ${
+                      selectedTemplate?.id === template.id
+                        ? 'border-blue-400 shadow-lg shadow-blue-400/20'
+                        : 'border-gray-600/50 hover:border-gray-500/50'
+                    }`}
+                    onClick={() => selectTemplate(template.id)}
+                  >
+                    <div className="w-full h-full relative">
+                      <Image
+                        src={template.url}
+                        alt={template.name}
+                        fill
+                        style={{ objectFit: "cover" }}
+                        unoptimized
+                      />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1 truncate">
+                      {template.name.length > 12 ? `${template.name.substring(0, 12)}...` : template.name}
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <button
               type="button"
-              className={`${styles.scrollBtn} ${styles.scrollRight}`}
+              className="absolute right-0 z-10 bg-gray-800/80 hover:bg-gray-700/80 text-white px-2 py-1 rounded border border-gray-600/50 hover:border-gray-500/50 transition-colors"
               onClick={() => scrollTemplates('right')}
               aria-label="Scroll templates right"
             >
@@ -245,68 +247,67 @@ export default function MemeGenerator({ onShowAdminDashboard: _ }: MemeGenerator
         </div>
 
         {/* Captions */}
-        <div className={styles.captionsSection}>
-          <div className={styles.captionsHeader}>
-            <div className={styles.captionsGrid}>
-              {texts.map((text, index) => (
-                <div key={index} className={styles.captionInput}>
-                  <label className={styles.inputLabel}>
-                    {index === 0 ? "Top text" : "Bottom text"}
-                  </label>
-                  <input
-                    type="text"
-                    className={styles.textInput}
-                    placeholder={`Enter ${index === 0 ? "top" : "bottom"} text`}
-                    value={text}
-                    onChange={event => handleTextChange(index, event.target.value)}
-                  />
-                </div>
-              ))}
+        <div className="flex items-end gap-2">
+          {texts.map((text, index) => (
+            <div key={index} className="flex-1 flex flex-col gap-1">
+              <label className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                {index === 0 ? "Top text" : "Bottom text"}
+              </label>
+              <input
+                type="text"
+                className="w-full px-3 py-2 bg-gray-800/80 border border-blue-400/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-400/50 focus:ring-1 focus:ring-blue-400/25"
+                placeholder={`Enter ${index === 0 ? "top" : "bottom"} text`}
+                value={text}
+                onChange={event => handleTextChange(index, event.target.value)}
+              />
             </div>
+          ))}
+          <div className="flex flex-col gap-1">
+            <div className="h-[18px]"></div> {/* Spacer to align with label height */}
             <button
               type="button"
-              className={styles.toolsBtn}
+              className="px-3 py-2 bg-gray-700/80 hover:bg-gray-600/80 text-white rounded-lg border border-gray-600/50 hover:border-gray-500/50 transition-colors text-sm font-medium h-[42px] flex items-center justify-center"
               onClick={() => setShowTools(!showTools)}
             >
               ⚙️ Tools
             </button>
           </div>
+        </div>
 
-          {/* Tools Modal */}
+        {/* Tools Modal */}
           {showTools && (
-            <div className={styles.modalOverlay} onClick={() => setShowTools(false)}>
-              <div className={styles.toolsModal} onClick={(e) => e.stopPropagation()}>
-                <div className={styles.modalHeader}>
-                  <h4 className={styles.modalTitle}>Meme Settings</h4>
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowTools(false)}>
+              <div className="bg-gray-900/95 border border-blue-400/20 rounded-xl backdrop-blur-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                <div className="flex justify-between items-center p-4 border-b border-blue-400/10">
+                  <h4 className="text-lg font-bold text-white m-0">Meme Settings</h4>
                   <button
                     type="button"
-                    className={styles.closeBtn}
+                    className="text-gray-400 hover:text-white text-xl leading-none"
                     onClick={() => setShowTools(false)}
                   >
                     ✕
                   </button>
                 </div>
-                <div className={styles.settingsGrid}>
-                  <div className={styles.settingGroup}>
-                    <label className={styles.inputLabel}>Font</label>
+                <div className="p-4 grid grid-cols-1 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-semibold text-gray-300">Font</label>
                     <select
-                      className={styles.selectInput}
+                      className="w-full px-3 py-2 bg-gray-800/80 border border-blue-400/20 rounded-lg text-white focus:outline-none focus:border-blue-400/50"
                       value={font}
                       onChange={event => setFont(event.target.value)}
                     >
                       <option value="impact">Impact</option>
-                      <option value="titilliumweb">Titillium Web</option>
-                      <option value="kalam">Kalam</option>
-                      <option value="notosans">Noto Sans</option>
-                      <option value="notosanshebrew">Noto Sans Hebrew</option>
-                      <option value="hgminchob">HG Mincho</option>
+                      <option value="anton">Anton</option>
+                      <option value="arial">Arial</option>
+                      <option value="comic-sans">Comic Sans</option>
+                      <option value="times">Times</option>
                     </select>
                   </div>
 
-                  <div className={styles.settingGroup}>
-                    <label className={styles.inputLabel}>Format</label>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-semibold text-gray-300">Format</label>
                     <select
-                      className={styles.selectInput}
+                      className="w-full px-3 py-2 bg-gray-800/80 border border-blue-400/20 rounded-lg text-white focus:outline-none focus:border-blue-400/50"
                       value={extension}
                       onChange={event => setExtension(event.target.value as "png" | "jpg" | "gif")}
                     >
@@ -316,52 +317,39 @@ export default function MemeGenerator({ onShowAdminDashboard: _ }: MemeGenerator
                     </select>
                   </div>
 
-                  <div className={styles.settingGroup}>
-                    <label className={styles.inputLabel}>Text Color</label>
-                    <div className={styles.colorPickerContainer}>
-                      <input
-                        type="color"
-                        value={textColor || "#ffffff"}
-                        onChange={(e) => setTextColor(e.target.value)}
-                        className={styles.colorInput}
-                        title="Choose text color"
-                      />
-                      <span className={styles.colorValue}>{textColor || "#ffffff"}</span>
-                      <button
-                        type="button"
-                        className={styles.resetColorBtn}
-                        onClick={() => setTextColor("")}
-                        title="Reset to default"
-                      >
-                        ↺
-                      </button>
-                    </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-semibold text-gray-300">Text Color</label>
+                    <input
+                      type="color"
+                      className="w-full h-10 bg-gray-800/80 border border-blue-400/20 rounded-lg cursor-pointer"
+                      value={textColor || "#ffffff"}
+                      onChange={event => setTextColor(event.target.value)}
+                    />
                   </div>
                 </div>
               </div>
             </div>
           )}
-        </div>
 
         {/* Mint Bar */}
-        <div className={styles.mintBar}>
-          <div className={styles.mintInfo}>
+        <div className="mt-auto pt-4 border-t border-blue-400/10">
+          <div className="flex justify-between items-center text-sm text-gray-400 mb-3">
             {selectedTemplate ? (
-              <>
+              <span>
                 {selectedTemplate.width}×{selectedTemplate.height} · {extension.toUpperCase()} · Network: Base
-              </>
+              </span>
             ) : (
-              "Select a template to begin"
+              <span>Select a template to begin</span>
             )}
           </div>
-          <div className={styles.mintActions}>
+          <div className="flex justify-end">
             <button
               type="button"
-              className={styles.mintBtn}
+              className="px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
               onClick={handleGenerate}
               disabled={loading || waitingForConfirmation}
             >
-              {loading ? "Generating..." : waitingForConfirmation ? "Generating..." : "Generate Meme"}
+              {loading ? "Generating..." : waitingForConfirmation ? "Confirming..." : "Generate Meme"}
             </button>
           </div>
         </div>
@@ -369,33 +357,25 @@ export default function MemeGenerator({ onShowAdminDashboard: _ }: MemeGenerator
 
       {/* Share/Download Popup */}
       {showShareDownload && (
-        <div className={styles.modalOverlay} onClick={() => setShowShareDownload(false)}>
-          <div className={styles.shareModal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.modalHeader}>
-              <h4 className={styles.modalTitle}>Meme Generated!</h4>
-              <button
-                type="button"
-                className={styles.closeBtn}
-                onClick={() => setShowShareDownload(false)}
-              >
-                ✕
-              </button>
-            </div>
-            <div className={styles.shareActions}>
-              <button
-                type="button"
-                className={styles.shareBtn}
-                onClick={handleShare}
-              >
-                🔄 Recast
-              </button>
-              <button
-                type="button"
-                className={styles.downloadBtn}
-                onClick={handleDownload}
-              >
-                ⬇️ Download
-              </button>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowShareDownload(false)}>
+          <div className="bg-gray-900/95 border border-blue-400/20 rounded-xl backdrop-blur-xl shadow-2xl max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="p-4 text-center">
+              <h3 className="text-lg font-bold text-white mb-2">🎉 Meme Generated!</h3>
+              <p className="text-gray-300 mb-4">Your meme has been successfully minted as an NFT on Base!</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleShare}
+                  className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                >
+                  🔄 Recast
+                </button>
+                <button
+                  onClick={handleDownload}
+                  className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                >
+                  ⬇️ Download
+                </button>
+              </div>
             </div>
           </div>
         </div>

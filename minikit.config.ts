@@ -30,7 +30,7 @@ export const minikitConfig = {
     ],
     iconUrl: "https://mememint-one.vercel.app/icon.png",
     splashImageUrl: "https://mememint-one.vercel.app/splash.png",
-    splashBackgroundColor: "#667eea",
+    splashBackgroundColor: "#0f172a",
     homeUrl: "https://mememint-one.vercel.app",
     aspectRatio: "square",
     webhookUrl: "https://mememint-one.vercel.app/api/webhook",

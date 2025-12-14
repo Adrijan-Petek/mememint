@@ -1,19 +1,68 @@
 "use client";
 import { useState } from "react";
-import Header from "../components/Header";
-import Navigation from "../components/Navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { WalletButton } from "../components/WalletButton";
 import AdminDashboard from "../components/AdminDashboard";
 import { useLeaderboard } from "../hooks/useLeaderboard";
 
 export default function LeaderboardPage() {
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
+  const [adminClickCount, setAdminClickCount] = useState(0);
+  const pathname = usePathname();
   const { leaderboardData, stats, loading, error, formatAddress, formatTime } = useLeaderboard();
+
+  const handleLogoClick = () => {
+    setAdminClickCount(prev => {
+      const newCount = prev + 1;
+      if (newCount >= 5) {
+        setShowAdminDashboard(true);
+        return 0;
+      }
+      // Reset count after 3 seconds
+      setTimeout(() => setAdminClickCount(0), 3000);
+      return newCount;
+    });
+  };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-app-bg bg-[400%_400%] animate-gradient-shift font-sans relative before:absolute before:inset-0 before:bg-hero-bg before:pointer-events-none before:opacity-80">
-        <Header onShowAdminDashboard={() => setShowAdminDashboard(true)} />
-        <Navigation />
+        <header className="bg-gradient-to-br from-[rgba(13,13,13,0.95)] to-[rgba(26,26,26,0.95)] backdrop-blur-[20px] border-b border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.3)] z-10">
+          <div className="max-w-5xl mx-auto px-4 md:px-6">
+            {/* Top row: Logo and Wallet */}
+            <div className="flex justify-between items-center min-h-[50px] md:min-h-[45px]">
+              <div className="flex items-center gap-2 md:gap-4 cursor-pointer" onClick={handleLogoClick}>
+                <Image src="/logo.png" alt="Mememint" priority width={120} height={60} className="w-[120px] h-auto transition-transform hover:scale-105 md:w-[150px] md:h-auto" />
+              </div>
+              <WalletButton />
+            </div>
+
+            {/* Bottom row: Navigation */}
+            <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] border-t border-white/5">
+              <nav className="flex gap-4 md:gap-6 items-center">
+                <Link
+                  href="/"
+                  className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${
+                    pathname === '/' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''
+                  }`}
+                >
+                  Home
+                </Link>
+                <Link
+                  href="/leaderboard"
+                  className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${
+                    pathname === '/leaderboard' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''
+                  }`}
+                >
+                  Leaderboard
+                </Link>
+              </nav>
+            </div>
+          </div>
+        </header>
+
         <main className="p-8 max-w-7xl mx-auto relative z-10 pt-36 md:p-4 md:pt-30 sm:p-3 sm:pt-28">
           <div className="flex flex-col items-center justify-center min-h-[400px] text-white/80">
             <div className="w-12 h-12 border-2 border-white/10 border-t-2 border-t-blue-400 rounded-full animate-spin mb-4"></div>
@@ -31,8 +80,39 @@ export default function LeaderboardPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-app-bg bg-[400%_400%] animate-gradient-shift font-sans relative before:absolute before:inset-0 before:bg-hero-bg before:pointer-events-none before:opacity-80">
-        <Header onShowAdminDashboard={() => setShowAdminDashboard(true)} />
-        <Navigation />
+        <header className="bg-gradient-to-br from-[rgba(13,13,13,0.95)] to-[rgba(26,26,26,0.95)] backdrop-blur-[20px] border-b border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.3)] z-10">
+          <div className="max-w-5xl mx-auto px-4 md:px-6">
+            {/* Top row: Logo and Wallet */}
+            <div className="flex justify-between items-center min-h-[50px] md:min-h-[45px]">
+              <div className="flex items-center gap-2 md:gap-4 cursor-pointer" onClick={handleLogoClick}>
+                <Image src="/logo.png" alt="Mememint" priority width={120} height={60} className="w-[120px] h-auto transition-transform hover:scale-105 md:w-[150px] md:h-auto" />
+              </div>
+              <WalletButton />
+            </div>
+
+            {/* Bottom row: Navigation */}
+            <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] border-t border-white/5">
+              <nav className="flex gap-4 md:gap-6 items-center">
+                <Link
+                  href="/"
+                  className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${
+                    pathname === '/' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''
+                  }`}
+                >
+                  Home
+                </Link>
+                <Link
+                  href="/leaderboard"
+                  className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${
+                    pathname === '/leaderboard' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''
+                  }`}
+                >
+                  Leaderboard
+                </Link>
+              </nav>
+            </div>
+          </div>
+        </header>
         <main className="p-8 max-w-7xl mx-auto relative z-10 pt-36 md:p-4 md:pt-30 sm:p-3 sm:pt-28">
           <div className="flex flex-col items-center justify-center min-h-[400px] text-center text-white/80 p-8">
             <h2 className="text-red-500 mb-4 text-3xl">Unable to Load Leaderboard</h2>
@@ -50,8 +130,40 @@ export default function LeaderboardPage() {
 
   return (
     <div className="min-h-screen bg-app-bg bg-[400%_400%] animate-gradient-shift font-sans relative before:absolute before:inset-0 before:bg-hero-bg before:pointer-events-none before:opacity-80">
-      <Header onShowAdminDashboard={() => setShowAdminDashboard(true)} />
-      <Navigation />
+      <header className="bg-gradient-to-br from-[rgba(13,13,13,0.95)] to-[rgba(26,26,26,0.95)] backdrop-blur-[20px] border-b border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.3)] z-10">
+        <div className="max-w-5xl mx-auto px-4 md:px-6">
+          {/* Top row: Logo and Wallet */}
+          <div className="flex justify-between items-center min-h-[50px] md:min-h-[45px]">
+            <div className="flex items-center gap-2 md:gap-4 cursor-pointer" onClick={handleLogoClick}>
+              <Image src="/logo.png" alt="Mememint" priority width={120} height={60} className="w-[120px] h-auto transition-transform hover:scale-105 md:w-[150px] md:h-auto" />
+            </div>
+            <WalletButton />
+          </div>
+
+          {/* Bottom row: Navigation */}
+          <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] border-t border-white/5">
+            <nav className="flex gap-4 md:gap-6 items-center">
+              <Link
+                href="/"
+                className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${
+                  pathname === '/' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''
+                }`}
+              >
+                Home
+              </Link>
+              <Link
+                href="/leaderboard"
+                className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${
+                  pathname === '/leaderboard' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''
+                }`}
+              >
+                Leaderboard
+              </Link>
+            </nav>
+          </div>
+        </div>
+      </header>
+
 
       <main className="p-8 max-w-7xl mx-auto relative z-10 pt-36 md:p-4 md:pt-30 sm:p-3 sm:pt-28">
         <div className="text-center mb-12">
