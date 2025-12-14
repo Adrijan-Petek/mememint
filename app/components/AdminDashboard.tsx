@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import styles from './AdminDashboard.module.css';
 import { useAdminContract } from '../hooks/useAdminContract';
 
 const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
@@ -142,51 +141,51 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
   }
 
   return (
-    <div className={styles.overlay}>
-      <div className={styles.dashboard}>
-        <div className={styles.header}>
-          <h2>🔧 Admin Dashboard</h2>
-          <button onClick={onClose} className={styles.closeBtn}>✕</button>
+    <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 flex items-center justify-center z-[1000] backdrop-blur-[10px]">
+      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 border-2 border-indigo-500 rounded-3xl p-8 w-[90%] max-w-3xl max-h-[90vh] overflow-y-auto shadow-[0_25px_50px_rgba(79,70,229,0.3)] relative">
+        <div className="flex justify-between items-center mb-8 border-b-2 border-indigo-500 pb-4">
+          <h2 className="text-white m-0 text-3xl font-bold text-shadow-[0_0_10px_rgba(79,70,229,0.5)]">🔧 Admin Dashboard</h2>
+          <button onClick={onClose} className="bg-red-500 text-white border-none rounded-full w-10 h-10 flex items-center justify-center cursor-pointer hover:bg-red-600 transition-colors duration-200 text-xl font-bold">✕</button>
         </div>
 
         {/* Tab Navigation */}
-        <div className={styles.tabs}>
+        <div className="flex gap-2 mb-6">
           <button 
-            className={`${styles.tab} ${activeTab === 'controls' ? styles.activeTab : ''}`}
+            className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200 ${activeTab === 'controls' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
             onClick={() => setActiveTab('controls')}
           >
             🎛️ Controls
           </button>
           <button 
-            className={`${styles.tab} ${activeTab === 'templates' ? styles.activeTab : ''}`}
+            className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200 ${activeTab === 'templates' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
             onClick={() => setActiveTab('templates')}
           >
             🎨 Templates
           </button>
         </div>
 
-        <div className={styles.content}>
+        <div className="space-y-6">
           {activeTab === 'controls' && (
             <>
               {/* Contract Stats */}
-              <div className={styles.section}>
-                <h3>📊 Contract Statistics</h3>
-                <div className={styles.stats}>
-                  <div className={styles.stat}>
-                    <span className={styles.label}>Total Generates:</span>
-                    <span className={styles.value}>{totalMints ? (Number(totalMints) - 1).toString() : '0'}</span>
+              <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-600">
+                <h3 className="text-xl font-bold text-white mb-4">📊 Contract Statistics</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-slate-700/50 p-4 rounded-lg">
+                    <span className="text-gray-400 text-sm">Total Generates:</span>
+                    <span className="text-white text-lg font-semibold block">{totalMints ? (Number(totalMints) - 1).toString() : '0'}</span>
                   </div>
-                  <div className={styles.stat}>
-                    <span className={styles.label}>Current Fee:</span>
-                    <span className={styles.value}>{mintFee ? mintFee : '0'} ETH</span>
+                  <div className="bg-slate-700/50 p-4 rounded-lg">
+                    <span className="text-gray-400 text-sm">Current Fee:</span>
+                    <span className="text-white text-lg font-semibold block">{mintFee ? mintFee : '0'} ETH</span>
                   </div>
-                  <div className={styles.stat}>
-                    <span className={styles.label}>Total Revenue:</span>
-                    <span className={styles.value}>{totalRevenue ? totalRevenue : '0'} ETH</span>
+                  <div className="bg-slate-700/50 p-4 rounded-lg">
+                    <span className="text-gray-400 text-sm">Total Revenue:</span>
+                    <span className="text-white text-lg font-semibold block">{totalRevenue ? totalRevenue : '0'} ETH</span>
                   </div>
-                  <div className={styles.stat}>
-                    <span className={styles.label}>Status:</span>
-                    <span className={`${styles.value} ${isPaused ? styles.paused : styles.active}`}>
+                  <div className="bg-slate-700/50 p-4 rounded-lg">
+                    <span className="text-gray-400 text-sm">Status:</span>
+                    <span className={`text-lg font-semibold block ${isPaused ? 'text-red-400' : 'text-green-400'}`}>
                       {isPaused ? '⏸️ Paused' : '▶️ Active'}
                     </span>
                   </div>
@@ -194,21 +193,21 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
               </div>
 
               {/* Fee Management */}
-              <div className={styles.section}>
-                <h3>💰 Fee Management</h3>
-                <div className={styles.feeControl}>
+              <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-600">
+                <h3 className="text-xl font-bold text-white mb-4">💰 Fee Management</h3>
+                <div className="flex gap-4">
                   <input
                     type="number"
                     step="0.000001"
                     placeholder="New fee in ETH"
                     value={newFee}
                     onChange={(e) => setNewFee(e.target.value)}
-                    className={styles.input}
+                    className="flex-1 px-4 py-2 bg-slate-700 border border-slate-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500"
                   />
                   <button 
                     onClick={handleSetFeeClick} 
                     disabled={!newFee || isLoading}
-                    className={styles.actionBtn}
+                    className="px-6 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                   >
                     Set Fee
                   </button>
@@ -216,20 +215,20 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
               </div>
 
               {/* Reset User Generates */}
-              <div className={styles.section}>
-                <h3>🔄 Reset User Generates</h3>
-                <div className={styles.feeControl}>
+              <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-600">
+                <h3 className="text-xl font-bold text-white mb-4">🔄 Reset User Generates</h3>
+                <div className="flex gap-4">
                   <input
                     type="text"
                     placeholder="User wallet address (0x...)"
                     value={resetAddress}
                     onChange={(e) => setResetAddress(e.target.value)}
-                    className={styles.input}
+                    className="flex-1 px-4 py-2 bg-slate-700 border border-slate-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500"
                   />
                   <button 
                     onClick={handleResetGenerates} 
                     disabled={!resetAddress || isLoading}
-                    className={styles.actionBtn}
+                    className="px-6 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                   >
                     Reset Daily Generates
                   </button>
@@ -237,13 +236,13 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
               </div>
 
               {/* Contract Controls */}
-              <div className={styles.section}>
-                <h3>🎛️ Contract Controls</h3>
-                <div className={styles.controls}>
+              <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-600">
+                <h3 className="text-xl font-bold text-white mb-4">🎛️ Contract Controls</h3>
+                <div className="flex gap-4">
                   <button 
                     onClick={isPaused ? handleUnpause : handlePause}
                     disabled={isLoading}
-                    className={`${styles.actionBtn} ${isPaused ? styles.unpauseBtn : styles.pauseBtn}`}
+                    className={`px-6 py-2 text-white rounded-lg font-semibold hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 ${isPaused ? 'bg-green-600' : 'bg-red-600'}`}
                   >
                     {isPaused ? '▶️ Unpause Contract' : '⏸️ Pause Contract'}
                   </button>
@@ -251,13 +250,13 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
               </div>
 
               {/* Revenue Management */}
-              <div className={styles.section}>
-                <h3>💳 Revenue Management</h3>
-                <div className={styles.controls}>
+              <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-600">
+                <h3 className="text-xl font-bold text-white mb-4">💳 Revenue Management</h3>
+                <div className="flex gap-4 mb-4">
                   <button 
                     onClick={handleWithdraw}
                     disabled={isLoading || !totalRevenue || totalRevenue === '0'}
-                    className={`${styles.actionBtn} ${styles.withdrawBtn}`}
+                    className="px-6 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                     title={!totalRevenue || totalRevenue === '0' ? 'No funds to withdraw' : 'Withdraw all revenue to owner'}
                   >
                     💰 Withdraw Revenue
@@ -265,32 +264,32 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
                   <button 
                     onClick={handleEmergencyWithdraw}
                     disabled={isLoading || !totalRevenue || totalRevenue === '0'}
-                    className={`${styles.actionBtn} ${styles.emergencyBtn}`}
+                    className="px-6 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                     title="Emergency withdrawal - use only if normal withdraw fails"
                   >
                     🚨 Emergency Withdraw
                   </button>
                 </div>
-                <p className={styles.hint}>
+                <p className="text-gray-400 text-sm">
                   💡 Emergency withdraw should only be used if normal withdraw fails
                 </p>
               </div>
 
               {/* Contract Info */}
-              <div className={styles.section}>
-                <h3>📋 Contract Information</h3>
-                <div className={styles.info}>
-                  <div className={styles.infoRow}>
-                    <span className={styles.label}>Contract Address:</span>
-                    <span className={styles.address}>{CONTRACT_ADDRESS}</span>
+              <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-600">
+                <h3 className="text-xl font-bold text-white mb-4">📋 Contract Information</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Contract Address:</span>
+                    <span className="text-white font-mono text-sm">{CONTRACT_ADDRESS}</span>
                   </div>
-                  <div className={styles.infoRow}>
-                    <span className={styles.label}>Owner:</span>
-                    <span className={styles.address}>{owner}</span>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Owner:</span>
+                    <span className="text-white font-mono text-sm">{owner}</span>
                   </div>
-                  <div className={styles.infoRow}>
-                    <span className={styles.label}>Network:</span>
-                    <span className={styles.value}>Base Mainnet</span>
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Network:</span>
+                    <span className="text-white">Base Mainnet</span>
                   </div>
                 </div>
               </div>
@@ -300,19 +299,19 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
           {activeTab === 'templates' && (
             <>
               {/* Upload Template */}
-              <div className={styles.section}>
-                <h3>📤 Upload Template</h3>
-                <div className={styles.uploadControl}>
+              <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-600">
+                <h3 className="text-xl font-bold text-white mb-4">📤 Upload Template</h3>
+                <div className="flex gap-4">
                   <input
                     type="file"
                     accept=".jpg,.jpeg,.png,.webp"
                     onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-                    className={styles.fileInput}
+                    className="flex-1 px-4 py-2 bg-slate-700 border border-slate-500 rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-700"
                   />
                   <button 
                     onClick={handleUploadTemplate} 
                     disabled={!uploadFile || isLoadingTemplates}
-                    className={styles.actionBtn}
+                    className="px-6 py-2 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                   >
                     Upload
                   </button>
@@ -320,20 +319,20 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
               </div>
 
               {/* Image Templates */}
-              <div className={styles.section}>
-                <h3>🖼️ Image Templates ({templates.images.length})</h3>
-                <div className={styles.templateList}>
+              <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-600">
+                <h3 className="text-xl font-bold text-white mb-4">🖼️ Image Templates ({templates.images.length})</h3>
+                <div className="space-y-2">
                   {isLoadingTemplates ? (
-                    <p>Loading...</p>
+                    <p className="text-gray-400">Loading...</p>
                   ) : templates.images.length === 0 ? (
-                    <p>No image templates</p>
+                    <p className="text-gray-400">No image templates</p>
                   ) : (
                     templates.images.map((fileName) => (
-                      <div key={fileName} className={styles.templateItem}>
-                        <span className={styles.fileName}>{fileName}</span>
+                      <div key={fileName} className="flex justify-between items-center bg-slate-700/50 p-3 rounded-lg">
+                        <span className="text-white text-sm">{fileName}</span>
                         <button 
                           onClick={() => handleDeleteTemplate(fileName)}
-                          className={styles.deleteBtn}
+                          className="px-3 py-1 bg-red-600 text-white rounded font-semibold hover:bg-red-700 disabled:opacity-50 transition-colors duration-200 text-sm"
                           disabled={isLoadingTemplates}
                         >
                           🗑️ Delete
@@ -348,9 +347,11 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
         </div>
 
         {isLoading && (
-          <div className={styles.loading}>
-            <div className={styles.spinner}></div>
-            <span>Processing transaction...</span>
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-3xl">
+            <div className="flex items-center gap-3 text-white">
+              <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Processing transaction...</span>
+            </div>
           </div>
         )}
       </div>

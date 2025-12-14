@@ -14,7 +14,6 @@ import { Address, Name, Identity } from "@coinbase/onchainkit/identity";
 import { useAccount } from "wagmi";
 import { base } from "wagmi/chains";
 import { sdk } from "@farcaster/miniapp-sdk";
-import styles from "./Header.module.css";
 
 interface HeaderProps {
   onShowAdminDashboard: () => void;
@@ -54,26 +53,19 @@ export default function Header({ onShowAdminDashboard }: HeaderProps) {
   };
 
   return (
-    <header className={styles.header}>
-      <div className={styles.logo} onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
-        <Image src="/logo.png" alt="Mememint" width={180} height={100} priority />
+    <header className="flex justify-between items-center py-3 px-4 md:py-4 md:px-8 bg-[rgba(13,13,13,0.8)] backdrop-blur-xl border-b border-white/10 shadow-lg">
+      <div className="flex items-center gap-2 md:gap-4 cursor-pointer" onClick={handleLogoClick}>
+        <Image src="/logo.png" alt="Mememint" width={120} height={60} priority className="transition-transform hover:scale-105 md:w-[150px] md:h-[75px]" />
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div className="flex items-center gap-2 md:gap-4">
         {isWrongNetwork && (
-          <div style={{
-            padding: '8px 12px',
-            background: '#ff4444',
-            color: 'white',
-            borderRadius: '8px',
-            fontSize: '14px',
-            fontWeight: 'bold'
-          }}>
+          <div className="px-2 py-1 md:px-3 md:py-2 bg-red-500 text-white rounded-lg text-xs md:text-sm font-bold">
             ⚠️ Wrong Network: {chain?.name} - Switch to Base
           </div>
         )}
         <Wallet>
-          <div style={{ fontSize: '0.875rem', padding: '0.5rem 1rem', display: 'inline-block' }}>
+          <div className="text-xs md:text-sm px-3 py-1 md:px-4 md:py-2 inline-block">
             <ConnectWallet>
               <Name />
             </ConnectWallet>
