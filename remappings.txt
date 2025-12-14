@@ -1,0 +1,2 @@
+@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol=@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol
+@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol=@openzeppelin/contracts-upgradeable/utils/PausableUpgradeable.sol

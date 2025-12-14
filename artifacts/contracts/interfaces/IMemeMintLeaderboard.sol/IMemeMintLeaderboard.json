@@ -1,0 +1,179 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "IMemeMintLeaderboard",
+  "sourceName": "contracts/interfaces/IMemeMintLeaderboard.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "position",
+          "type": "uint256"
+        }
+      ],
+      "name": "getEntryAtPosition",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "totalMints",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "lastMintTime",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IMemeMintLeaderboard.LeaderboardEntry",
+          "name": "entry",
+          "type": "tuple"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getLeaderboardStats",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "totalMinters",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "minMints",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "count",
+          "type": "uint256"
+        }
+      ],
+      "name": "getTopMinters",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "totalMints",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "lastMintTime",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IMemeMintLeaderboard.LeaderboardEntry[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "getUserEntry",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "user",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "totalMints",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "lastMintTime",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IMemeMintLeaderboard.LeaderboardEntry",
+          "name": "entry",
+          "type": "tuple"
+        },
+        {
+          "internalType": "uint256",
+          "name": "position",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "name": "isInTop100",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "newTotalMints",
+          "type": "uint256"
+        }
+      ],
+      "name": "updateMinter",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

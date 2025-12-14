@@ -1,0 +1,329 @@
+.toolbarContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.section {
+  padding: 1rem;
+  background: radial-gradient(circle at 20% 20%, rgba(96, 165, 250, 0.16), transparent 55%),
+    radial-gradient(circle at 80% 0%, rgba(167, 139, 250, 0.18), transparent 50%),
+    rgba(12, 12, 16, 0.88);
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(24px);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0;
+  gap: 1rem;
+  padding: 1rem 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.sectionHeader:hover {
+  background: rgba(59, 130, 246, 0.06);
+  border-radius: 12px;
+}
+
+.sectionHeader.open {
+  margin-bottom: 1.25rem;
+}
+
+.sectionHeader h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: #f8fafc;
+}
+
+.sectionHeader p {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  color: rgba(226, 232, 240, 0.75);
+}
+
+.sectionContent {
+  animation: slideDown 0.3s ease-out;
+  overflow: hidden;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.gridTwoColumn {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.controlCard {
+  padding: 1rem;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.55);
+  border: 1px solid rgba(59, 130, 246, 0.15);
+  box-shadow: inset 0 1px 0 rgba(148, 163, 184, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cardBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(226, 232, 240, 0.8);
+}
+
+.lineActions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.textArea {
+  width: 100%;
+  min-height: 68px;
+  border-radius: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.18);
+  background: rgba(12, 14, 22, 0.75);
+  color: #f8fafc;
+  padding: 0.9rem 1rem;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  resize: vertical;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.textArea:focus {
+  outline: none;
+  border-color: rgba(96, 165, 250, 0.6);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+.gridResponsive {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.chipGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chipButton {
+  border: 1px solid rgba(71, 85, 105, 0.65);
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem;
+  background: rgba(30, 41, 59, 0.65);
+  color: rgba(226, 232, 240, 0.9);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.chipButton:hover {
+  transform: translateY(-1px);
+  border-color: rgba(96, 165, 250, 0.7);
+  background: rgba(30, 64, 175, 0.55);
+  color: #f8fafc;
+}
+
+.chipActive {
+  border-color: rgba(96, 165, 250, 0.95);
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.55), rgba(167, 139, 250, 0.55));
+  color: #f9fafb;
+  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.35);
+}
+
+.colorField {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.colorInput {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.colorHexInput {
+  flex: 1;
+  border-radius: 12px;
+  border: 1px solid rgba(71, 85, 105, 0.65);
+  background: rgba(15, 23, 42, 0.7);
+  color: #e2e8f0;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.colorHexInput:focus {
+  outline: none;
+  border-color: rgba(96, 165, 250, 0.65);
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+}
+
+.helperText {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  color: rgba(148, 163, 184, 0.85);
+}
+
+.toolbox {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(167, 139, 250, 0.25));
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  box-shadow: 0 18px 40px rgba(37, 99, 235, 0.25);
+}
+
+.toolRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.primaryAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  background: linear-gradient(135deg, #60a5fa, #8b5cf6);
+  border: none;
+  border-radius: 16px;
+  padding: 0.9rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f8fafc;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: 0 16px 32px rgba(99, 102, 241, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primaryAction:hover:not(.actionDisabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px rgba(79, 70, 229, 0.4);
+}
+
+.primaryIcon {
+  font-size: 1.25rem;
+}
+
+.actionDisabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.secondaryActions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.secondaryAction {
+  background: rgba(15, 23, 42, 0.75);
+  color: rgba(226, 232, 240, 0.95);
+  border-radius: 12px;
+  border: 1px solid rgba(96, 165, 250, 0.35);
+  padding: 0.85rem 1.2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.secondaryAction:hover {
+  transform: translateY(-1px);
+  border-color: rgba(167, 139, 250, 0.7);
+}
+
+@media (max-width: 1024px) {
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .toolRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .secondaryActions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .secondaryAction {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding: 0.75rem;
+  }
+
+  .gridTwoColumn,
+  .gridResponsive {
+    grid-template-columns: 1fr;
+  }
+
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .lineActions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .primaryAction {
+    width: 100%;
+  }
+
+  .secondaryActions {
+    flex-direction: column;
+  }
+
+  .secondaryAction {
+    width: 100%;
+  }
+}
