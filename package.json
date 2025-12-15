@@ -29,6 +29,8 @@
     "@openzeppelin/contracts": "^4.9.3",
     "@openzeppelin/contracts-upgradeable": "^4.9.3",
     "@rainbow-me/rainbowkit": "^2.2.10",
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.87.1",
     "@tailwindcss/postcss": "^4.1.18",
     "@tanstack/react-query": "^5.81.5",
     "dotenv": "^17.2.2",

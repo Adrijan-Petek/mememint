@@ -4,18 +4,18 @@ require('dotenv').config();
 
 // Read the compiled contract ABIs
 const memeMintPath = path.join(__dirname, '../artifacts/contracts/MemeMint.sol/MemeMint.json');
-const leaderboardPath = path.join(__dirname, '../artifacts/contracts/MemeMintLeaderboard.sol/MemeMintLeaderboard.json');
+const treasuryPath = path.join(__dirname, '../artifacts/contracts/Treasury.sol/Treasury.json');
 
 const memeMintContract = JSON.parse(fs.readFileSync(memeMintPath, 'utf8'));
-const leaderboardContract = JSON.parse(fs.readFileSync(leaderboardPath, 'utf8'));
+const treasuryContract = JSON.parse(fs.readFileSync(treasuryPath, 'utf8'));
 
 // Extract ABIs
 const memeMintAbi = memeMintContract.abi;
-const leaderboardAbi = leaderboardContract.abi;
+const treasuryAbi = treasuryContract.abi;
 
 // Get addresses from environment
 const memeMintAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '';
-const leaderboardAddress = process.env.NEXT_PUBLIC_LEADERBOARD_ADDRESS || '';
+const treasuryAddress = process.env.NEXT_PUBLIC_TREASURY_ADDRESS || '';
 const network = process.env.NEXT_PUBLIC_NETWORK || 'base';
 
 // Write to TypeScript files
@@ -29,14 +29,14 @@ export const MEME_MINT_ADDRESS = "${memeMintAddress}" as const;
 export const MEME_MINT_ABI = ${JSON.stringify(memeMintAbi, null, 2)} as const;
 `;
 
-const leaderboardOutput = `// Auto-generated contract ABI
+const treasuryOutput = `// Auto-generated contract ABI
 // Generated on: ${new Date().toISOString()}
 // Network: ${network}
-// Contract Address: ${leaderboardAddress}
+// Contract Address: ${treasuryAddress}
 
-export const LEADERBOARD_ADDRESS = "${leaderboardAddress}" as const;
+export const TREASURY_ADDRESS = "${treasuryAddress}" as const;
 
-export const LEADERBOARD_ABI = ${JSON.stringify(leaderboardAbi, null, 2)} as const;
+export const TREASURY_ABI = ${JSON.stringify(treasuryAbi, null, 2)} as const;
 `;
 
 const outputDir = path.join(__dirname, '../app/contracts');
@@ -48,7 +48,7 @@ if (!fs.existsSync(outputDir)) {
 
 // Write files
 fs.writeFileSync(path.join(outputDir, 'MemeMintABI.ts'), memeMintOutput);
-fs.writeFileSync(path.join(outputDir, 'LeaderboardABI.ts'), leaderboardOutput);
+fs.writeFileSync(path.join(outputDir, 'TreasuryABI.ts'), treasuryOutput);
 
 console.log('\n✅ ABIs exported successfully!');
 console.log('='.repeat(60));
@@ -60,9 +60,9 @@ console.log(`   Functions: ${memeMintAbi.filter(item => item.type === 'function'
 console.log(`   Events: ${memeMintAbi.filter(item => item.type === 'event').length}`);
 console.log(`   Errors: ${memeMintAbi.filter(item => item.type === 'error').length}`);
 console.log('');
-console.log('📋 Leaderboard Contract:');
-console.log(`   Address: ${leaderboardAddress}`);
-console.log(`   Functions: ${leaderboardAbi.filter(item => item.type === 'function').length}`);
-console.log(`   Events: ${leaderboardAbi.filter(item => item.type === 'event').length}`);
-console.log(`   Errors: ${leaderboardAbi.filter(item => item.type === 'error').length}`);
+console.log('📋 Treasury Contract:');
+console.log(`   Address: ${treasuryAddress}`);
+console.log(`   Functions: ${treasuryAbi.filter(item => item.type === 'function').length}`);
+console.log(`   Events: ${treasuryAbi.filter(item => item.type === 'event').length}`);
+console.log(`   Errors: ${treasuryAbi.filter(item => item.type === 'error').length}`);
 console.log('='.repeat(60));

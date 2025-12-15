@@ -16,9 +16,9 @@ async function main() {
 
   // Contract ABI
   const contractABI = [
-    "function mintFee() view returns (uint256)",
-    "function mintMeme() payable",
-    "function totalMints() view returns (uint256)",
+    "function generationFee() view returns (uint256)",
+    "function generateMeme(address user, string templateId, string topText, string bottomText) payable",
+    "function canGenerateFree(address user) view returns (bool)",
   ];
 
   try {

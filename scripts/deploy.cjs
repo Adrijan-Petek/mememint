@@ -1,149 +1,77 @@
-const { ethers, upgrades } = require("hardhat");
+const { ethers } = require("hardhat");
 
 async function main() {
-  console.log("Deploying MemeMint contract to", network.name);
+  console.log("Redeploying Mememint contract with fixed ETH transfer...");
 
   // Get the deployer account
   const signers = await ethers.getSigners();
   const deployer = signers[0];
   const deployerAddress = deployer.address;
-  console.log("Deploying contracts with the account:", deployerAddress);
-  
-  const balance = await deployer.provider.getBalance(deployerAddress);
-  console.log("Account balance:", ethers.formatEther(balance), "ETH");
+  console.log("Deploying with account:", deployerAddress);
 
-  // Deploy the upgradeable MemeMint contract
-  const MemeMint = await ethers.getContractFactory("MemeMint");
-  
-  // Initial parameters for the contract
-  const initialOwner = deployerAddress;
-  const initialMintFee = ethers.parseEther("0.000017"); // 0.000017 ETH (updated)
+  // Use existing treasury address
+  const TREASURY_ADDRESS = "0x4458bFdd688Df499Bc01e4E5890d0e9aA8aFa857";
+  console.log("Using Treasury:", TREASURY_ADDRESS);
 
-  console.log("Deploying MemeMint with initial owner:", initialOwner);
-  console.log("Initial mint fee:", ethers.formatEther(initialMintFee), "ETH");
+  // Deploy updated Mememint contract
+  console.log("Deploying Mememint contract...");
+  const Mememint = await ethers.getContractFactory("Mememint");
+  const mememint = await Mememint.deploy(TREASURY_ADDRESS);
+  await mememint.waitForDeployment();
+  const mememintAddress = await mememint.getAddress();
+  console.log("✅ New Mememint deployed to:", mememintAddress);
 
-  // Deploy as upgradeable proxy
-  const memeMint = await upgrades.deployProxy(
-    MemeMint,
-    [initialOwner, initialMintFee],
-    { 
-      initializer: 'initialize',
-      kind: 'uups'
-    }
-  );
+  // Wait for indexing
+  console.log("Waiting for contract indexing...");
+  await new Promise(resolve => setTimeout(resolve, 10000));
 
-  await memeMint.waitForDeployment();
-  const address = await memeMint.getAddress();
-  console.log("MemeMint deployed to:", address);
-  
-  // Wait for contract to be indexed
-  console.log("Waiting for contract to be indexed...");
-  await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
-  
-  // Get implementation address with error handling
-  let implementationAddress;
-  try {
-    implementationAddress = await upgrades.erc1967.getImplementationAddress(address);
-    console.log("Implementation deployed to:", implementationAddress);
-  } catch {
-    console.log("Note: Could not retrieve implementation address immediately (this is normal for new deployments)");
-  }
+  console.log("\n🚀 UPDATE YOUR FRONTEND:");
+  console.log("Old Mememint:", "0x3617fbe729fF3eB2d4377Fd90560111754BB1275");
+  console.log("New Mememint:", mememintAddress);
+  console.log("Treasury (unchanged):", TREASURY_ADDRESS);
 
-  // Verify contract stats
-  const mintFee = await memeMint.mintFee();
-  const owner = await memeMint.owner();
-  console.log("Contract mint fee:", ethers.formatEther(mintFee), "ETH");
-  console.log("Contract owner:", owner);
-
-  // Deploy the upgradeable MemeMintLeaderboard contract
-  console.log("\nDeploying MemeMintLeaderboard contract...");
-  const MemeMintLeaderboard = await ethers.getContractFactory("MemeMintLeaderboard");
-
-  console.log("Deploying MemeMintLeaderboard with initial owner:", initialOwner);
-
-  // Deploy leaderboard as upgradeable proxy
-  const leaderboard = await upgrades.deployProxy(
-    MemeMintLeaderboard,
-    [initialOwner],
-    { 
-      initializer: 'initialize',
-      kind: 'uups'
-    }
-  );
-
-  await leaderboard.waitForDeployment();
-
-  const leaderboardAddress = await leaderboard.getAddress();
-  console.log("MemeMintLeaderboard deployed to:", leaderboardAddress);
-  
-  // Wait for contract to be indexed
-  console.log("Waiting for contract to be indexed...");
-  await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds
-  
-  // Get leaderboard implementation address with error handling
-  let leaderboardImplementationAddress;
-  try {
-    leaderboardImplementationAddress = await upgrades.erc1967.getImplementationAddress(leaderboardAddress);
-    console.log("Leaderboard implementation deployed to:", leaderboardImplementationAddress);
-  } catch {
-    console.log("Note: Could not retrieve implementation address immediately (this is normal for new deployments)");
-  }
-
-  // Verify leaderboard contract stats
-  const leaderboardOwner = await leaderboard.owner();
-  console.log("Leaderboard contract owner:", leaderboardOwner);
+  // Transfer ownership if needed
+  console.log("\n📋 NEXT STEPS:");
+  console.log("1. Update CONTRACT_ADDRESSES.mememint in addresses.ts");
+  console.log("2. Test minting - fees should now go to Treasury");
+  console.log("3. Migrate user data if needed");
 
   // Save deployment info
   const deploymentInfo = {
-    network: network.name,
-    memeMint: {
-      proxy: address,
-      implementation: implementationAddress,
-    },
-    leaderboard: {
-      proxy: leaderboardAddress,
-      implementation: leaderboardImplementationAddress,
-    },
+    network: hre.network.name,
+    treasury: TREASURY_ADDRESS,
+    mememint: mememintAddress,
     deployer: deployerAddress,
-    mintFee: ethers.formatEther(mintFee),
-    owner: owner,
     timestamp: new Date().toISOString()
   };
 
-  console.log("\n=== Deployment Summary ===");
-  console.log(JSON.stringify(deploymentInfo, null, 2));
   console.log("\n=== Environment Variables ===");
-  console.log(`NEXT_PUBLIC_CONTRACT_ADDRESS=${address}`);
-  console.log(`NEXT_PUBLIC_LEADERBOARD_ADDRESS=${leaderboardAddress}`);
-  console.log(`NEXT_PUBLIC_NETWORK=${network.name}`);
+  console.log(`NEXT_PUBLIC_MEMEMINT_ADDRESS=${mememintAddress}`);
+  console.log(`NEXT_PUBLIC_TREASURY_ADDRESS=${TREASURY_ADDRESS}`);
+  console.log(`NEXT_PUBLIC_NETWORK=${hre.network.name}`);
 
-  // Verify the contracts on Basescan (if on testnet/mainnet)
-  if (network.name !== "hardhat" && network.name !== "localhost") {
+  // Verify contracts if on a public network
+  if (hre.network.name !== "hardhat" && hre.network.name !== "localhost") {
     console.log("\nWaiting for block confirmations...");
-    await memeMint.deploymentTransaction().wait(6);
-    await leaderboard.deploymentTransaction().wait(6);
+    await mememint.deploymentTransaction().wait(6);
 
-    console.log("Verifying contracts...");
+    console.log("Verifying Mememint contract...");
     try {
-      // Verify the MemeMint implementation contract
       await hre.run("verify:verify", {
-        address: implementationAddress,
-        constructorArguments: [],
+        address: mememintAddress,
+        constructorArguments: [TREASURY_ADDRESS],
+        contract: "contracts/MemeMint.sol:Mememint"
       });
-      console.log("MemeMint implementation contract verified!");
-
-      // Verify the Leaderboard implementation contract
-      await hre.run("verify:verify", {
-        address: leaderboardImplementationAddress,
-        constructorArguments: [],
-      });
-      console.log("Leaderboard implementation contract verified!");
+      console.log("✅ Mememint verified");
     } catch (error) {
-      console.log("Verification failed:", error.message);
+      console.log("❌ Verification failed:", error.message);
     }
   }
+
+  console.log("\n🎉 Deployment completed successfully!");
 }
 
+// Execute the main function
 main()
   .then(() => process.exit(0))
   .catch((error) => {

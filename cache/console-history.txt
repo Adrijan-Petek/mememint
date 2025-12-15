@@ -1,3 +1,0 @@
-npx hardhat run scripts/check-contract-state.cjs --network base
-npx hardhat run scripts/check-ownership.cjs --network base
-const memeMint = await ethers.getContractAt("MemeM

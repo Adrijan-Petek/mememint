@@ -4,11 +4,11 @@ import "@openzeppelin/hardhat-upgrades";
 /** @type import('hardhat/config').HardhatUserConfig */
 const config = {
   solidity: {
-    version: "0.8.28",
+    version: "0.8.19",
     settings: {
       optimizer: {
         enabled: true,
-        runs: 200
+        runs: 1000
       }
     }
   },

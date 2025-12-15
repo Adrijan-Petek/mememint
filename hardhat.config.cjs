@@ -1,7 +1,7 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("@openzeppelin/hardhat-upgrades");
 require("hardhat-gas-reporter");
-require("dotenv").config();
+require("dotenv").config({ path: ".env.local" });
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -22,11 +22,11 @@ module.exports = {
       url: "http://127.0.0.1:8545",
       chainId: 1337
     },
-    // Base Mainnet - use MAINNET_PRIVATE_KEY for production
+    // Base Mainnet - use PRIVATE_KEY for production
     base: {
       url: process.env.BASE_MAINNET_RPC || "https://mainnet.base.org",
       chainId: 8453,
-      accounts: process.env.MAINNET_PRIVATE_KEY ? [process.env.MAINNET_PRIVATE_KEY] : [],
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       gasPrice: "auto", // Auto-determine gas price
       timeout: 120000, // 2 minute timeout
     }

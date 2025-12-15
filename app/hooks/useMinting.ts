@@ -3,7 +3,10 @@ import { useState, useEffect } from "react";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContract } from "wagmi";
 import { formatEther } from "viem";
 import { base } from "wagmi/chains";
-import { MEME_MINT_ABI, MEME_MINT_ADDRESS } from "../contracts/MemeMintABI";
+import { MEME_MINT_ABI } from "../contracts/MemeMintABI";
+import { CONTRACT_ADDRESSES } from "../contracts/addresses";
+import { supabase } from "@/utils/supabase/client";
+import { useScoring } from "./useScoring";
 
 export function useMinting() {
   const [waitingForConfirmation, setWaitingForConfirmation] = useState(false);
@@ -12,24 +15,25 @@ export function useMinting() {
   const { data: transactionReceipt, isSuccess: isTransactionConfirmed } = useWaitForTransactionReceipt({
     hash,
   });
+  const { addScore } = useScoring();
 
-  // Fetch current mint fee from contract
-  const { data: mintFee, isError: mintFeeError, isLoading: mintFeeLoading, error: mintFeeErrorDetails } = useReadContract({
-    address: MEME_MINT_ADDRESS,
+  // Fetch current generation fee from contract
+  const { data: generationFee, isError: generationFeeError, isLoading: generationFeeLoading, error: generationFeeErrorDetails } = useReadContract({
+    address: CONTRACT_ADDRESSES.mememint as `0x${string}`,
     abi: MEME_MINT_ABI,
-    functionName: 'mintFee',
+    functionName: 'generationFee',
   });
 
-  // Debug mint fee fetch
+  // Debug generation fee fetch
   useEffect(() => {
-    console.log('Mint Fee Status:', {
-      mintFee: mintFee?.toString(),
-      isLoading: mintFeeLoading,
-      isError: mintFeeError,
-      error: mintFeeErrorDetails,
-      contractAddress: MEME_MINT_ADDRESS
+    console.log('Generation Fee Status:', {
+      generationFee: generationFee?.toString(),
+      isLoading: generationFeeLoading,
+      isError: generationFeeError,
+      error: generationFeeErrorDetails,
+      contractAddress: CONTRACT_ADDRESSES.mememint
     });
-  }, [mintFee, mintFeeLoading, mintFeeError, mintFeeErrorDetails]);
+  }, [generationFee, generationFeeLoading, generationFeeError, generationFeeErrorDetails]);
 
   // Onchain Kit handles network management, so we don't need manual network checks
 
@@ -37,13 +41,19 @@ export function useMinting() {
   useEffect(() => {
     if (isTransactionConfirmed && transactionReceipt) {
       setWaitingForConfirmation(false);
+      // Award points for successful meme generation
+      if (address) {
+        addScore('generate', address);
+        // Increment mint count in database
+        supabase.rpc('increment_mint_count', { user_address_param: address });
+      }
     }
-  }, [isTransactionConfirmed, transactionReceipt]);
+  }, [isTransactionConfirmed, transactionReceipt, address, addScore]);
 
   // Trigger minting transaction when waitingForConfirmation becomes true
   useEffect(() => {
     const sendMintTransaction = async () => {
-      if (waitingForConfirmation && address && writeContract && mintFee) {
+        if (waitingForConfirmation && address && writeContract && generationFee) {
         // Validate wallet connection
         if (!isConnected) {
           console.error('❌ Wallet not connected');
@@ -68,24 +78,26 @@ export function useMinting() {
         }
 
         console.log('✅ Network check passed:', chain.name, 'Chain ID:', chain.id);
-        console.log('Starting mint transaction with fee:', mintFee.toString(), 'wei');
-        console.log('Contract address:', MEME_MINT_ADDRESS);
+        console.log('Starting generation transaction with fee:', generationFee.toString(), 'wei');
+        console.log('Contract address:', CONTRACT_ADDRESSES.mememint);
         console.log('User address:', address);
         
         try {
-          // Use writeContract for proper contract interaction with dynamic mint fee
+          // Use writeContract for proper contract interaction with dynamic generation fee
           console.log('📝 Preparing transaction...');
           console.log('  Chain ID:', chain.id);
-          console.log('  Contract:', MEME_MINT_ADDRESS);
-          console.log('  Value:', mintFee.toString(), 'wei (', formatEther(mintFee), 'ETH)');
+          console.log('  Contract:', CONTRACT_ADDRESSES.mememint);
+          console.log('  Value:', generationFee.toString(), 'wei (', formatEther(generationFee), 'ETH)');
           console.log('  Gas Limit:', '200000');
           
           writeContract({
-            address: MEME_MINT_ADDRESS as `0x${string}`,
+            address: CONTRACT_ADDRESSES.mememint as `0x${string}`,
             abi: MEME_MINT_ABI,
-            functionName: 'mintMeme',
-            value: mintFee as bigint,
-            chainId: base.id,
+            functionName: 'generateMeme',
+            args: [address as `0x${string}`, "default", "Top Text", "Bottom Text"],
+            value: generationFee as bigint,
+            account: address,
+            chain: base,
           });
           console.log('✅ Transaction submitted to wallet');
         } catch (error) {
@@ -113,15 +125,15 @@ export function useMinting() {
             chainName: chain?.name,
             isCorrectChain: chain?.id === base.id,
             hasWriteContract: !!writeContract,
-            hasMintFee: !!mintFee,
-            mintFee: mintFee?.toString()
+            hasGenerationFee: !!generationFee,
+            generationFee: generationFee?.toString()
           });
         }
       }
     };
 
     sendMintTransaction();
-  }, [waitingForConfirmation, address, writeContract, mintFee, isConnected, chain]);
+  }, [waitingForConfirmation, address, writeContract, generationFee, isConnected, chain]);
 
   const startMinting = () => {
     setWaitingForConfirmation(true);
@@ -137,7 +149,7 @@ export function useMinting() {
     transactionReceipt,
     startMinting,
     resetMinting,
-    mintFee: mintFee ? formatEther(mintFee) : '0',
-    mintFeeWei: mintFee
+    mintFee: generationFee ? formatEther(generationFee) : '0',
+    mintFeeWei: generationFee
   };
 }
