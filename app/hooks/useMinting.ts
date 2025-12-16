@@ -5,7 +5,6 @@ import { formatEther } from "viem";
 import { base } from "wagmi/chains";
 import { MEME_MINT_ABI } from "../contracts/MemeMintABI";
 import { CONTRACT_ADDRESSES } from "../contracts/addresses";
-import { supabase } from "@/utils/supabase/client";
 import { useScoring } from "./useScoring";
 
 export function useMinting() {
@@ -44,8 +43,18 @@ export function useMinting() {
       // Award points for successful meme generation
       if (address) {
         addScore('generate', address);
-        // Increment mint count in database
-        supabase.rpc('increment_mint_count', { user_address_param: address });
+        // Increment mint count via API
+        fetch('/api/leaderboard/increment-mint-count', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userAddress: address.toLowerCase(),
+          }),
+        }).catch(error => {
+          console.error('Error incrementing mint count:', error);
+        });
       }
     }
   }, [isTransactionConfirmed, transactionReceipt, address, addScore]);

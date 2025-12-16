@@ -1,11 +1,12 @@
 "use client";
 import { useState, useCallback } from "react";
-import { supabase } from "@/utils/supabase/client";
+import { sdk } from '@farcaster/miniapp-sdk';
 
 export interface UserProfile {
   address: `0x${string}`;
   name: string;
   pfp: string; // profile picture URL
+  fid: number | null; // Farcaster ID
   score: number;
   rank?: number;
 }
@@ -40,36 +41,28 @@ export function useScoring() {
     const points = SCORING_CONFIG[action];
 
     try {
-      // First, ensure user exists
-      const { data: existingUser } = await supabase
-        .from('users')
-        .select('address')
-        .eq('address', userAddress)
-        .single();
+      const response = await fetch('/api/leaderboard/add-score', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action,
+          userAddress: userAddress.toLowerCase(),
+          points
+        }),
+      });
 
-      if (!existingUser) {
-        await supabase
-          .from('users')
-          .insert([{ address: userAddress }]);
+      if (!response.ok) {
+        throw new Error('Failed to add score');
       }
 
-      // Add score entry
-      const { data, error } = await supabase
-        .from('scores')
-        .insert([{
-          user_address: userAddress,
-          action,
-          points
-        }])
-        .select()
-        .single();
-
-      if (error) throw error;
+      const result = await response.json();
 
       // Update local state
       setUserScore(prev => prev + points);
 
-      return { success: true, newScore: data };
+      return { success: true, newScore: result.data };
     } catch (error) {
       console.error('Error updating score:', error);
       throw error;
@@ -90,42 +83,101 @@ export function useLeaderboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch user profiles from Farcaster using API
+  const fetchFarcasterProfiles = async (addresses: `0x${string}`[]) => {
+    try {
+      const response = await fetch('/api/profiles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          addresses: addresses.map(addr => addr.toLowerCase())
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch profiles');
+      }
+
+      const profiles = await response.json();
+      return profiles;
+    } catch (error) {
+      console.warn('❌ Failed to fetch Farcaster profiles:', error);
+      return {};
+    }
+  };
+
   // Fetch leaderboard data
   const fetchLeaderboard = useCallback(async (limit: number = 100) => {
     try {
       setLoading(true);
       setError(null);
 
-      // Get users with their total scores and mint counts
-      const { data, error: queryError } = await supabase
-        .rpc('get_leaderboard', { limit_param: limit });
+      const response = await fetch(`/api/leaderboard?limit=${limit}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch leaderboard: ${response.status}`);
+      }
 
-      if (queryError) throw queryError;
+      const result = await response.json();
 
-      // Transform the flat data structure to match LeaderboardEntry interface
-      const transformedData: LeaderboardEntry[] = (data || []).map((item: any) => ({
-        user: {
-          address: item.user_address as `0x${string}`,
-          name: item.name || '',
-          pfp: item.pfp || `https://api.dicebear.com/7.x/avataaars/svg?seed=${item.user_address}`,
-          score: item.total_score
-        },
-        score: item.total_score,
-        rank: item.rank,
-        lastActivity: new Date(item.last_activity)
-      }));
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      const data = result.data;
+
+      if (!Array.isArray(data)) {
+        throw new Error('Leaderboard data is not an array');
+      }
+
+      // Extract addresses for Farcaster profile fetching
+      const userAddresses = (data || []).map((item: any) => item.user_address as `0x${string}`);
+
+      // Fetch all Farcaster profiles in batch
+      const farcasterProfiles = await fetchFarcasterProfiles(userAddresses);
+
+      // Transform the flat data structure with database profiles, fetch missing ones
+      const transformedData: LeaderboardEntry[] = (data || []).map((item: any) => {
+        const address = item.user_address.toLowerCase();
+        
+        // Use database data if available, otherwise use fetched data
+        const dbProfile = {
+          username: item.name || null,
+          pfp: item.pfp || null,
+          fid: item.fid || null,
+        };
+        
+        const farcasterProfile = farcasterProfiles[address] || dbProfile;
+
+        return {
+          user: {
+            address: item.user_address as `0x${string}`,
+            name: farcasterProfile.username || '',
+            pfp: farcasterProfile.pfp || `https://api.dicebear.com/7.x/avataaars/svg?seed=${item.user_address}`,
+            fid: farcasterProfile.fid,
+            score: item.total_score
+          },
+          score: item.total_score,
+          rank: item.rank,
+          lastActivity: new Date(item.last_activity)
+        };
+      });
 
       setLeaderboardData(transformedData);
 
       // Get stats
-      const { data: statsData, error: statsError } = await supabase
-        .rpc('get_leaderboard_stats');
+      const statsResponse = await fetch('/api/leaderboard/stats');
+      if (statsResponse.ok) {
+        const statsResult = await statsResponse.json();
+        const statsData = statsResult.data;
 
-      if (!statsError && statsData && statsData.length > 0) {
-        setStats({
-          totalUsers: statsData[0].total_users,
-          totalScore: statsData[0].total_score
-        });
+        if (statsData) {
+          setStats({
+            totalUsers: Number(statsData.total_users),
+            totalScore: Number(statsData.total_score)
+          });
+        }
       }
 
     } catch (err) {
@@ -138,12 +190,13 @@ export function useLeaderboard() {
   // Get user rank
   const getUserRank = useCallback(async (userAddress: `0x${string}`) => {
     try {
-      const { data, error } = await supabase
-        .rpc('get_user_rank', { user_address_param: userAddress });
+      const response = await fetch(`/api/leaderboard/rank?address=${userAddress.toLowerCase()}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch user rank');
+      }
 
-      if (error) throw error;
-
-      return data?.[0]?.rank || null;
+      const result = await response.json();
+      return result.data.rank;
     } catch (error) {
       console.error('Error fetching user rank:', error);
       throw error;
@@ -161,15 +214,13 @@ export function useLeaderboard() {
   // Get user mint count from database
   const getUserMintCount = useCallback(async (userAddress: `0x${string}`) => {
     try {
-      const { data, error } = await supabase
-        .from('mint_counts')
-        .select('count')
-        .eq('user_address', userAddress)
-        .single();
+      const response = await fetch(`/api/leaderboard/user-mint-count?address=${userAddress.toLowerCase()}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch user mint count');
+      }
 
-      if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "not found"
-
-      return data?.count || 0;
+      const result = await response.json();
+      return result.data;
     } catch (error) {
       console.error('Error fetching mint count:', error);
       throw error;
@@ -179,12 +230,13 @@ export function useLeaderboard() {
   // Get user's total points including mint bonuses
   const getUserTotalPoints = useCallback(async (userAddress: `0x${string}`) => {
     try {
-      const { data, error } = await supabase
-        .rpc('get_user_total_points', { user_address_param: userAddress });
+      const response = await fetch(`/api/leaderboard/user-points?address=${userAddress.toLowerCase()}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch user total points');
+      }
 
-      if (error) throw error;
-
-      return data?.[0]?.total_points || 0;
+      const result = await response.json();
+      return result.data;
     } catch (error) {
       console.error('Error fetching total points:', error);
       throw error;
@@ -194,12 +246,13 @@ export function useLeaderboard() {
   // Get mint statistics
   const getMintStats = useCallback(async () => {
     try {
-      const { data, error } = await supabase
-        .rpc('get_mint_stats');
+      const response = await fetch('/api/leaderboard/mint-stats');
+      if (!response.ok) {
+        throw new Error('Failed to fetch mint stats');
+      }
 
-      if (error) throw error;
-
-      return data?.[0] || { totalMints: 0, uniqueUsers: 0 };
+      const result = await response.json();
+      return result.data;
     } catch (error) {
       console.error('Error fetching mint stats:', error);
       throw error;

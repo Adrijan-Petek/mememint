@@ -256,7 +256,12 @@ export default function LeaderboardPage() {
                   </div>
 
                   <div className="font-medium text-white/90 truncate text-sm md:text-xs sm:text-xs">
-                    {entry.user.name || formatAddress(entry.user.address)}
+                    <div className="flex flex-col">
+                      <span>{entry.user.name || formatAddress(entry.user.address)}</span>
+                      {entry.user.fid && (
+                        <span className="text-xs text-blue-400 font-medium">FID: {entry.user.fid}</span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="text-center">
