@@ -1,0 +1,366 @@
+"use client";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useAccount } from "wagmi";
+import { WalletButton } from "../components/WalletButton";
+import AdminDashboard from "../components/AdminDashboard";
+import { useLeaderboard } from "../hooks/useScoring";
+import { sdk } from "@farcaster/miniapp-sdk";
+
+// Profile data interface
+interface UserProfile {
+  address: `0x${string}`;
+  name: string;
+  pfp: string;
+  fid: number | null;
+  highScore: number;
+  lastScore: number;
+  position: number;
+  totalPoints: number;
+  mintCount: number;
+}
+
+export default function ProfilePage() {
+  const [showAdminDashboard, setShowAdminDashboard] = useState(false);
+  const [adminClickCount, setAdminClickCount] = useState(0);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [claiming, setClaiming] = useState(false);
+  const [recasting, setRecasting] = useState(false);
+  const pathname = usePathname();
+  const { address, isConnected } = useAccount();
+
+  const { fetchLeaderboard, formatAddress } = useLeaderboard();
+
+  useEffect(() => {
+    loadUserProfile();
+  }, [address, isConnected]);
+
+  const loadUserProfile = async () => {
+    if (!address || !isConnected) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Fetch user profile data
+      const [profileResponse, rankResponse, pointsResponse, mintCountResponse] = await Promise.all([
+        fetch(`/api/profiles?address=${address}`),
+        fetch(`/api/leaderboard/user-rank?address=${address}`),
+        fetch(`/api/leaderboard/user-points?address=${address}`),
+        fetch(`/api/leaderboard/user-mint-count?address=${address}`)
+      ]);
+
+      const profileData = profileResponse.ok ? await profileResponse.json() : null;
+      const rankData = rankResponse.ok ? await rankResponse.json() : { data: null };
+      const pointsData = pointsResponse.ok ? await pointsResponse.json() : { data: 0 };
+      const mintCountData = mintCountResponse.ok ? await mintCountResponse.json() : { data: 0 };
+
+      // Get leaderboard to find high score and last activity
+      const leaderboardResponse = await fetch('/api/leaderboard?limit=100');
+      const leaderboardData = leaderboardResponse.ok ? await leaderboardResponse.json() : { data: [] };
+
+      const userInLeaderboard = leaderboardData.data?.find((user: any) =>
+        user.user_address.toLowerCase() === address.toLowerCase()
+      );
+
+      setProfile({
+        address: address as `0x${string}`,
+        name: profileData?.username || 'Anonymous',
+        pfp: profileData?.pfp || `https://api.dicebear.com/7.x/avataaars/svg?seed=${address}`,
+        fid: profileData?.fid || null,
+        highScore: userInLeaderboard?.total_score || 0,
+        lastScore: userInLeaderboard?.total_score || 0, // For now, same as high score
+        position: rankData.data || 0,
+        totalPoints: pointsData.data || 0,
+        mintCount: mintCountData.data || 0
+      });
+
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogoClick = () => {
+    setAdminClickCount(prev => {
+      const newCount = prev + 1;
+      if (newCount >= 5) {
+        setShowAdminDashboard(true);
+        return 0;
+      }
+      // Reset count after 3 seconds
+      setTimeout(() => setAdminClickCount(0), 3000);
+      return newCount;
+    });
+  };
+
+  const handleClaimRewards = async () => {
+    try {
+      setClaiming(true);
+      // TODO: Implement reward claiming logic
+      // This would interact with your smart contract or reward system
+      alert('Reward claiming coming soon! 🪙');
+    } catch (error) {
+      console.error('Error claiming rewards:', error);
+    } finally {
+      setClaiming(false);
+    }
+  };
+
+  const handleRecast = async () => {
+    try {
+      setRecasting(true);
+      if (!profile) return;
+
+      const shareText = `🎨 Check out my Mememint profile!\n\n🏆 High Score: ${profile.highScore}\n📊 Position: #${profile.position}\n🖼️ NFTs Minted: ${profile.mintCount}\n\nJoin the meme-to-earn revolution! #Mememint #Farcaster`;
+
+      await sdk.actions.composeCast({
+        text: shareText,
+        embeds: ["https://mememint-one.vercel.app/profile"]
+      });
+    } catch (error) {
+      console.error('Error sharing profile:', error);
+    } finally {
+      setRecasting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-app-bg bg-[400%_400%] animate-gradient-shift font-sans relative before:absolute before:inset-0 before:bg-hero-bg before:pointer-events-none before:opacity-80">
+        <header className="bg-gradient-to-br from-[rgba(13,13,13,0.95)] to-[rgba(26,26,26,0.95)] backdrop-blur-[20px] border-b border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.3)] z-10">
+          <div className="max-w-5xl mx-auto px-4 md:px-6">
+            {/* Top row: Logo and Wallet */}
+            <div className="flex justify-between items-center min-h-[50px] md:min-h-[45px]">
+              <div className="flex items-center gap-2 md:gap-4 cursor-pointer" onClick={handleLogoClick}>
+                <Image src="/logo.png" alt="Mememint" priority width={120} height={60} className="w-[120px] h-auto transition-transform hover:scale-105 md:w-[150px] md:h-auto" />
+              </div>
+              <WalletButton />
+            </div>
+
+            {/* Bottom row: Navigation */}
+            <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] border-t border-white/5">
+              <nav className="flex gap-4 md:gap-6 items-center">
+                <Link
+                  href="/"
+                  className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${pathname === '/' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''}`}
+                >
+                  Home
+                </Link>
+                <Link
+                  href="/leaderboard"
+                  className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${pathname === '/leaderboard' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''}`}
+                >
+                  Leaderboard
+                </Link>
+                <Link
+                  href="/profile"
+                  className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${pathname === '/profile' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''}`}
+                >
+                  Profile
+                </Link>
+              </nav>
+            </div>
+          </div>
+        </header>
+
+        <main className="p-4 max-w-7xl mx-auto pt-24 md:p-2 md:pt-20 sm:p-1 sm:pt-16">
+          <div className="flex flex-col items-center justify-center min-h-[300px] text-white/80">
+            <div className="w-8 h-8 border-2 border-white/10 border-t-2 border-t-blue-400 rounded-full animate-spin mb-3"></div>
+            <p className="text-sm">Loading profile...</p>
+          </div>
+        </main>
+        <AdminDashboard
+          isVisible={showAdminDashboard}
+          onClose={() => setShowAdminDashboard(false)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-app-bg bg-[400%_400%] animate-gradient-shift font-sans relative before:absolute before:inset-0 before:bg-hero-bg before:pointer-events-none before:opacity-80">
+      <header className="bg-gradient-to-br from-[rgba(13,13,13,0.95)] to-[rgba(26,26,26,0.95)] backdrop-blur-[20px] border-b border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.3)] z-10">
+        <div className="max-w-5xl mx-auto px-4 md:px-6">
+          {/* Top row: Logo and Wallet */}
+          <div className="flex justify-between items-center min-h-[50px] md:min-h-[45px]">
+            <div className="flex items-center gap-2 md:gap-4 cursor-pointer" onClick={handleLogoClick}>
+              <Image src="/logo.png" alt="Mememint" priority width={120} height={60} className="w-[120px] h-auto transition-transform hover:scale-105 md:w-[150px] md:h-auto" />
+            </div>
+            <WalletButton />
+          </div>
+
+          {/* Bottom row: Navigation */}
+          <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] border-t border-white/5">
+            <nav className="flex gap-4 md:gap-6 items-center">
+              <Link
+                href="/"
+                className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${pathname === '/' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''}`}
+              >
+                Home
+              </Link>
+              <Link
+                href="/leaderboard"
+                className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${pathname === '/leaderboard' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''}`}
+              >
+                Leaderboard
+              </Link>
+              <Link
+                href="/profile"
+                className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${pathname === '/profile' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''}`}
+              >
+                Profile
+              </Link>
+            </nav>
+          </div>
+        </div>
+      </header>
+
+      <main className="p-4 max-w-4xl mx-auto pt-24 md:p-6 md:pt-20 sm:p-3 sm:pt-16">
+        {!isConnected ? (
+          <div className="flex flex-col items-center justify-center min-h-[300px] text-center">
+            <div className="text-6xl mb-4">🔗</div>
+            <h2 className="text-2xl font-bold text-white mb-4">Connect Your Wallet</h2>
+            <p className="text-white/60 mb-6 max-w-md">
+              Connect your wallet to view your Mememint profile, track your rewards, and share your achievements on Farcaster.
+            </p>
+            <WalletButton />
+          </div>
+        ) : profile && (
+          <div className="space-y-6">
+            {/* Profile Header */}
+            <div className="bg-white/5 backdrop-blur-[20px] border border-white/10 rounded-2xl p-6 shadow-2xl">
+              <div className="flex flex-col items-center space-y-4">
+                <div className="relative">
+                  <Image
+                    src={profile.pfp}
+                    alt={profile.name}
+                    width={120}
+                    height={120}
+                    className="rounded-full border-4 border-blue-500/50 shadow-lg"
+                  />
+                  {profile.fid && (
+                    <div className="absolute -bottom-2 -right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                      #{profile.fid}
+                    </div>
+                  )}
+                </div>
+
+                <div className="text-center">
+                  <h1 className="text-2xl font-bold text-white mb-1">{profile.name}</h1>
+                  <p className="text-white/60 text-sm">{formatAddress(profile.address)}</p>
+                  {profile.position > 0 && (
+                    <p className="text-blue-400 font-semibold mt-2">Rank #{profile.position}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white/5 backdrop-blur-[20px] border border-white/10 rounded-xl p-4 text-center shadow-lg">
+                <div className="text-2xl font-bold text-blue-400 mb-1">{profile.highScore.toLocaleString()}</div>
+                <div className="text-white/60 text-sm">High Score</div>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-[20px] border border-white/10 rounded-xl p-4 text-center shadow-lg">
+                <div className="text-2xl font-bold text-green-400 mb-1">{profile.lastScore.toLocaleString()}</div>
+                <div className="text-white/60 text-sm">Last Score</div>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-[20px] border border-white/10 rounded-xl p-4 text-center shadow-lg">
+                <div className="text-2xl font-bold text-purple-400 mb-1">{profile.totalPoints.toLocaleString()}</div>
+                <div className="text-white/60 text-sm">Total Points</div>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-[20px] border border-white/10 rounded-xl p-4 text-center shadow-lg">
+                <div className="text-2xl font-bold text-orange-400 mb-1">{profile.mintCount}</div>
+                <div className="text-white/60 text-sm">NFTs Minted</div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <button
+                onClick={handleClaimRewards}
+                disabled={claiming}
+                className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-500 disabled:to-gray-600 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-[0_8px_25px_rgba(34,197,94,0.3)] disabled:transform-none disabled:shadow-none"
+              >
+                {claiming ? (
+                  <div className="flex items-center justify-center">
+                    <div className="w-5 h-5 border-2 border-white/20 border-t-2 border-t-white rounded-full animate-spin mr-2"></div>
+                    Claiming...
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center">
+                    <span className="text-xl mr-2">🪙</span>
+                    Claim Rewards
+                  </div>
+                )}
+              </button>
+
+              <button
+                onClick={handleRecast}
+                disabled={recasting}
+                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-500 disabled:to-gray-600 text-white font-bold py-4 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-[0_8px_25px_rgba(139,92,246,0.3)] disabled:transform-none disabled:shadow-none"
+              >
+                {recasting ? (
+                  <div className="flex items-center justify-center">
+                    <div className="w-5 h-5 border-2 border-white/20 border-t-2 border-t-white rounded-full animate-spin mr-2"></div>
+                    Sharing...
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center">
+                    <span className="text-xl mr-2">🔄</span>
+                    Share Profile
+                  </div>
+                )}
+              </button>
+            </div>
+
+            {/* Achievement Preview */}
+            <div className="bg-white/5 backdrop-blur-[20px] border border-white/10 rounded-2xl p-6 shadow-2xl">
+              <h2 className="text-xl font-bold text-white mb-4 text-center">🏆 Achievements</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className={`text-center p-3 rounded-lg border ${profile.mintCount > 0 ? 'border-green-500/50 bg-green-500/10' : 'border-white/10 bg-white/5'}`}>
+                  <div className="text-2xl mb-1">🎨</div>
+                  <div className="text-sm text-white/80">First Meme</div>
+                  <div className={`text-xs ${profile.mintCount > 0 ? 'text-green-400' : 'text-white/40'}`}>
+                    {profile.mintCount > 0 ? 'Unlocked' : 'Locked'}
+                  </div>
+                </div>
+
+                <div className={`text-center p-3 rounded-lg border ${profile.highScore >= 1000 ? 'border-blue-500/50 bg-blue-500/10' : 'border-white/10 bg-white/5'}`}>
+                  <div className="text-2xl mb-1">⭐</div>
+                  <div className="text-sm text-white/80">High Scorer</div>
+                  <div className={`text-xs ${profile.highScore >= 1000 ? 'text-blue-400' : 'text-white/40'}`}>
+                    {profile.highScore >= 1000 ? 'Unlocked' : 'Locked'}
+                  </div>
+                </div>
+
+                <div className={`text-center p-3 rounded-lg border ${profile.position <= 10 && profile.position > 0 ? 'border-purple-500/50 bg-purple-500/10' : 'border-white/10 bg-white/5'}`}>
+                  <div className="text-2xl mb-1">👑</div>
+                  <div className="text-sm text-white/80">Top 10</div>
+                  <div className={`text-xs ${profile.position <= 10 && profile.position > 0 ? 'text-purple-400' : 'text-white/40'}`}>
+                    {profile.position <= 10 && profile.position > 0 ? 'Unlocked' : 'Locked'}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      <AdminDashboard
+        isVisible={showAdminDashboard}
+        onClose={() => setShowAdminDashboard(false)}
+      />
+    </div>
+  );
+}

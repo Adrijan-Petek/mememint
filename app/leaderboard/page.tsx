@@ -87,6 +87,14 @@ export default function LeaderboardPage() {
                 >
                   Leaderboard
                 </Link>
+                <Link
+                  href="/profile"
+                  className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${
+                    pathname === '/profile' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''
+                  }`}
+                >
+                  Profile
+                </Link>
               </nav>
             </div>
           </div>
