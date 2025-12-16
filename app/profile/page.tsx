@@ -50,15 +50,34 @@ export default function ProfilePage() {
     try {
       setLoading(true);
 
-      // Fetch user profile data
-      const [profileResponse, rankResponse, pointsResponse, mintCountResponse] = await Promise.all([
-        fetch(`/api/profiles?address=${targetAddress}`),
-        fetch(`/api/leaderboard/user-rank?address=${targetAddress}`),
-        fetch(`/api/leaderboard/user-points?address=${targetAddress}`),
-        fetch(`/api/leaderboard/user-mint-count?address=${targetAddress}`)
+      // Fetch user profile data (prefer DB record, fallback to Farcaster)
+      const profileDbPromise = fetch(`/api/user?address=${targetAddress}`);
+      const rankPromise = fetch(`/api/leaderboard/user-rank?address=${targetAddress}`);
+      const pointsPromise = fetch(`/api/leaderboard/user-points?address=${targetAddress}`);
+      const mintCountPromise = fetch(`/api/leaderboard/user-mint-count?address=${targetAddress}`);
+
+      const [profileDbResponse, rankResponse, pointsResponse, mintCountResponse] = await Promise.all([
+        profileDbPromise,
+        rankPromise,
+        pointsPromise,
+        mintCountPromise
       ]);
 
-      const profileData = profileResponse.ok ? await profileResponse.json() : null;
+      let profileData = null;
+      if (profileDbResponse.ok) {
+        const dbJson = await profileDbResponse.json();
+        if (dbJson?.data) {
+          profileData = dbJson.data;
+        }
+      }
+      // fallback to Farcaster hub if DB record missing
+      if (!profileData) {
+        const remote = await fetch(`/api/profiles?address=${targetAddress}`);
+        if (remote.ok) {
+          const remoteJson = await remote.json();
+          profileData = remoteJson;
+        }
+      }
       const rankData = rankResponse.ok ? await rankResponse.json() : { data: null };
       const pointsData = pointsResponse.ok ? await pointsResponse.json() : { data: 0 };
       const mintCountData = mintCountResponse.ok ? await mintCountResponse.json() : { data: 0 };
@@ -73,8 +92,8 @@ export default function ProfilePage() {
 
       setProfile({
         address: targetAddress as `0x${string}`,
-        name: profileData?.username || 'Anonymous',
-        pfp: profileData?.pfp || `https://api.dicebear.com/7.x/avataaars/svg?seed=${targetAddress}`,
+        name: profileData?.username || profileData?.name || 'Anonymous',
+        pfp: profileData?.pfp || profileData?.pfpUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${targetAddress}`,
         fid: profileData?.fid || null,
         highScore: userInLeaderboard?.total_score || 0,
         lastScore: userInLeaderboard?.total_score || 0, // For now, same as high score
@@ -241,12 +260,12 @@ export default function ProfilePage() {
             <div className="bg-white/5 backdrop-blur-[20px] border border-white/10 rounded-2xl p-6 shadow-2xl">
               <div className="flex flex-col items-center space-y-4">
                 <div className="relative">
-                  <Image
+                  <img
                     src={profile.pfp}
                     alt={profile.name}
                     width={120}
                     height={120}
-                    className="rounded-full border-4 border-blue-500/50 shadow-lg"
+                    className="rounded-full border-4 border-blue-500/50 shadow-lg object-cover w-[120px] h-[120px]"
                   />
                   {profile.fid && (
                     <div className="absolute -bottom-2 -right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
