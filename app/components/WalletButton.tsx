@@ -8,6 +8,7 @@ export function WalletButton({ onConnectClick }: { onConnectClick?: () => void }
   const [context, setContext] = useState<{ user?: { username?: string; fid?: number; pfpUrl?: string } } | null>(null)
   const [isInMiniApp, setIsInMiniApp] = useState(false)
   const [ready, setReady] = useState(false)
+  const [profileSaved, setProfileSaved] = useState(false)
 
   // Initialize SDK context and check if in MiniApp
   useEffect(() => {
@@ -59,6 +60,32 @@ export function WalletButton({ onConnectClick }: { onConnectClick?: () => void }
           account &&
           chain &&
           (!authenticationStatus || authenticationStatus === 'authenticated')
+
+        // Save profile to database when wallet connects
+        useEffect(() => {
+          if (connected && account?.address && !profileSaved) {
+            const saveProfile = async () => {
+              try {
+                const response = await fetch('/api/profiles', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({ addresses: account.address }),
+                })
+                if (response.ok) {
+                  console.log('✅ Profile saved for address:', account.address)
+                  setProfileSaved(true)
+                } else {
+                  console.warn('❌ Failed to save profile:', response.statusText)
+                }
+              } catch (error) {
+                console.warn('❌ Error saving profile:', error)
+              }
+            }
+            saveProfile()
+          }
+        }, [connected, account?.address, profileSaved])
 
         return (
           <div

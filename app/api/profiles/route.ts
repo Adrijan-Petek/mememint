@@ -85,10 +85,15 @@ export async function GET(request: NextRequest) {
 // Batch endpoint for multiple addresses
 export async function POST(request: NextRequest) {
   try {
-    const { addresses }: { addresses: string[] } = await request.json();
+    const body = await request.json();
+    let addresses: string[] = [];
 
-    if (!addresses || !Array.isArray(addresses)) {
-      return NextResponse.json({ error: 'Addresses array required' }, { status: 400 });
+    if (typeof body.addresses === 'string') {
+      addresses = [body.addresses];
+    } else if (Array.isArray(body.addresses)) {
+      addresses = body.addresses;
+    } else {
+      return NextResponse.json({ error: 'Addresses array or single address required' }, { status: 400 });
     }
 
     const profiles: Record<string, any> = {};
@@ -101,20 +106,25 @@ export async function POST(request: NextRequest) {
       const promises = batch.map(async (address) => {
         try {
           const fid = await getFidFromAddress(address);
+          let profile = null;
           if (fid) {
-            const profile = await getUserProfile(fid);
-            if (profile) {
-              profiles[address.toLowerCase()] = profile;
+            profile = await getUserProfile(fid);
+          }
 
-              // Save to database
-              try {
-                await sql('INSERT INTO users (address, fid, name, pfp, updated_at) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (address) DO UPDATE SET fid = EXCLUDED.fid, name = EXCLUDED.name, pfp = EXCLUDED.pfp, updated_at = EXCLUDED.updated_at',
-                  [address.toLowerCase(), profile.fid, profile.username, profile.pfp, new Date().toISOString()]);
-                console.log(`✅ Saved Farcaster profile for ${address}:`, profile);
-              } catch (error) {
-                console.warn(`❌ Failed to save profile for ${address}:`, error);
-              }
-            }
+          // Always save to database, even if no Farcaster profile
+          const name = profile?.username || address.toLowerCase();
+          const pfp = profile?.pfp || null;
+
+          try {
+            await sql('INSERT INTO users (address, fid, name, pfp, updated_at) VALUES ($1, $2, $3, $4, $5) ON CONFLICT (address) DO UPDATE SET fid = EXCLUDED.fid, name = EXCLUDED.name, pfp = EXCLUDED.pfp, updated_at = EXCLUDED.updated_at',
+              [address.toLowerCase(), fid, name, pfp, new Date().toISOString()]);
+            console.log(`✅ Saved profile for ${address}:`, { fid, name, pfp });
+          } catch (error) {
+            console.warn(`❌ Failed to save profile for ${address}:`, error);
+          }
+
+          if (profile) {
+            profiles[address.toLowerCase()] = profile;
           }
         } catch (error) {
           console.warn(`Failed to fetch profile for ${address}:`, error);
