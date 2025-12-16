@@ -42,6 +42,56 @@ export default function LeaderboardPage() {
     fetchLeaderboard(100);
   }, [fetchLeaderboard]);
 
+  // Prepare leaderboard rows using transformed leaderboardData
+  const leaderboardRows = (leaderboardData || [])
+    .filter(entry => {
+      const a = (entry.user?.address || '').toLowerCase();
+      // Exclude empty/placeholder addresses
+      if (!a) return false;
+      if (a === '0x0000000000000000000000000000000000000000') return false;
+      if (a === '0x00') return false;
+      return true;
+    })
+    .map((entry, index) => {
+      const addr = (entry.user.address || '').toLowerCase();
+      const displayName = entry.user.name && entry.user.name.length > 0 ? entry.user.name : null;
+      const pfpSrc = entry.user.pfp || `https://api.dicebear.com/7.x/avataaars/svg?seed=${addr}`;
+      const shortAddr = formatAddress(addr as any);
+
+      return (
+        <div key={addr} className={`grid grid-cols-[48px_56px_1fr_64px] gap-3 p-3 border-b border-white/5 transition-all duration-200 ease-out items-center hover:bg-white/2 last:border-b-0 md:grid-cols-[60px_160px_1fr_120px_140px] md:gap-3 md:p-4 sm:grid-cols-[50px_100px_1fr_80px] sm:gap-2 sm:p-3 ${index < 3 ? 'bg-gradient-to-br from-blue-400/5 to-green-400/5 border-l-4 border-blue-400' : ''}`}>
+          <div className="flex items-center gap-2 font-semibold text-white/90 md:text-sm sm:text-xs">
+            {index < 3 && (
+              <span className="text-lg md:text-base sm:text-sm">{index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}</span>
+            )}
+            <span className="text-base text-white/80 md:text-sm sm:text-xs">#{entry.rank}</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/20 flex-shrink-0 md:w-10 md:h-10 sm:w-8 sm:h-8">
+              <img src={pfpSrc} alt={displayName || 'Player'} width={40} height={40} className="w-full h-full object-cover" />
+            </div>
+          </div>
+
+          <div className="font-medium text-white/90 truncate text-sm md:text-xs sm:text-xs">
+            <div className="flex flex-col">
+                <Link href={`/profile?address=${addr}`} className="hover:underline truncate">
+                  <span>{displayName ?? shortAddr}</span>
+                </Link>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <span className="text-lg font-bold text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.3)] md:text-base sm:text-sm">{entry.score.toLocaleString()}</span>
+          </div>
+
+          <div className="text-right text-xs text-white/60 md:hidden">
+            <span className="bg-white/3 px-2 py-1 rounded-md font-medium">{formatTime(entry.lastActivity)}</span>
+          </div>
+        </div>
+      )
+    })
+
   const handleLogoClick = () => {
     setAdminClickCount(prev => {
       const newCount = prev + 1;
@@ -69,7 +119,7 @@ export default function LeaderboardPage() {
             </div>
 
             {/* Bottom row: Navigation */}
-            <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] border-t border-white/5">
+            <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] pt-3">
               <nav className="flex gap-4 md:gap-6 items-center">
                 <Link
                   href="/"
@@ -128,7 +178,7 @@ export default function LeaderboardPage() {
             </div>
 
             {/* Bottom row: Navigation */}
-            <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] border-t border-white/5">
+            <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] pt-3">
               <nav className="flex gap-4 md:gap-6 items-center">
                 <Link
                   href="/"
@@ -178,7 +228,7 @@ export default function LeaderboardPage() {
           </div>
 
           {/* Bottom row: Navigation */}
-          <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] border-t border-white/5">
+          <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] pt-3">
             <nav className="flex gap-4 md:gap-6 items-center">
               <Link
                 href="/"
@@ -195,6 +245,14 @@ export default function LeaderboardPage() {
                 }`}
               >
                 Leaderboard
+              </Link>
+              <Link
+                href="/profile"
+                className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${
+                  pathname === '/profile' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''
+                }`}
+              >
+                Profile
               </Link>
             </nav>
           </div>
@@ -238,53 +296,7 @@ export default function LeaderboardPage() {
             </div>
           ) : (
             <div className="max-h-[500px] overflow-y-auto md:max-h-[400px] sm:max-h-[300px]">
-              {leaderboardData
-                .filter(entry => entry.user.address !== '0x0000000000000000000000000000000000000000' && entry.user.address !== '0x00')
-                .map((entry, index) => (
-                <div key={entry.user.address} className={`grid grid-cols-[60px_160px_1fr_120px_140px] gap-3 p-4 border-b border-white/5 transition-all duration-200 ease-out items-center hover:bg-white/2 last:border-b-0 md:grid-cols-[50px_120px_1fr_80px] md:gap-2 md:p-3 sm:grid-cols-[50px_100px_1fr_80px] sm:gap-1 sm:p-2 ${index < 3 ? 'bg-gradient-to-br from-blue-400/5 to-green-400/5 border-l-4 border-blue-400' : ''}`}>
-                  <div className="flex items-center gap-2 font-semibold text-white/90 md:text-sm sm:text-xs">
-                    {index < 3 && (
-                      <span className="text-lg md:text-base sm:text-sm">
-                        {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
-                      </span>
-                    )}
-                    <span className="text-base text-white/80 md:text-sm sm:text-xs">#{entry.rank}</span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white/20 flex-shrink-0 md:w-8 md:h-8 sm:w-6 sm:h-6">
-                      <Image
-                        src={entry.user.pfp || `https://api.dicebear.com/7.x/avataaars/svg?seed=${entry.user.address}`}
-                        alt={entry.user.name || 'Player'}
-                        width={40}
-                        height={40}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="font-medium text-white/90 truncate text-sm md:text-xs sm:text-xs">
-                    <div className="flex flex-col">
-                      <span>{entry.user.name || formatAddress(entry.user.address)}</span>
-                      {entry.user.fid && (
-                        <span className="text-xs text-blue-400 font-medium">FID: {entry.user.fid}</span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="text-center">
-                    <span className="text-lg font-bold text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.3)] md:text-base sm:text-sm">
-                      {entry.score.toLocaleString()}
-                    </span>
-                  </div>
-
-                  <div className="text-right text-xs text-white/60 md:hidden">
-                    <span className="bg-white/3 px-2 py-1 rounded-md font-medium">
-                      {formatTime(entry.lastActivity)}
-                    </span>
-                  </div>
-                </div>
-              ))}
+              {leaderboardRows}
             </div>
           )}
         </div>

@@ -2,13 +2,12 @@
 
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { sdk } from '@farcaster/miniapp-sdk'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 export function WalletButton({ onConnectClick }: { onConnectClick?: () => void }) {
   const [context, setContext] = useState<{ user?: { username?: string; fid?: number; pfpUrl?: string } } | null>(null)
   const [isInMiniApp, setIsInMiniApp] = useState(false)
   const [ready, setReady] = useState(false)
-  const [profileSaved, setProfileSaved] = useState(false)
 
   // Initialize SDK context and check if in MiniApp
   useEffect(() => {
@@ -62,30 +61,40 @@ export function WalletButton({ onConnectClick }: { onConnectClick?: () => void }
           (!authenticationStatus || authenticationStatus === 'authenticated')
 
         // Save profile to database when wallet connects
+        const profileSavedRef = useRef(false)
         useEffect(() => {
-          if (connected && account?.address && !profileSaved) {
+          if (connected && account?.address && context?.user && !profileSavedRef.current) {
             const saveProfile = async () => {
-              try {
-                const response = await fetch('/api/profiles', {
+                  try {
+                    const user = context?.user
+                    const profileData = {
+                      address: account.address,
+                      fid: user?.fid ?? null,
+                      username: user?.username ?? account.address, // Fallback to address if no username
+                      pfpUrl: user?.pfpUrl ?? null // No fallback for pfp, use null
+                    };
+
+                const response = await fetch('/api/save-profile', {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
                   },
-                  body: JSON.stringify({ addresses: account.address }),
-                })
+                  body: JSON.stringify(profileData),
+                });
+
                 if (response.ok) {
-                  console.log('✅ Profile saved for address:', account.address)
-                  setProfileSaved(true)
+                  console.log('✅ Profile saved for address:', account.address, profileData);
+                  profileSavedRef.current = true;
                 } else {
-                  console.warn('❌ Failed to save profile:', response.statusText)
+                  console.warn('❌ Failed to save profile:', response.statusText);
                 }
               } catch (error) {
-                console.warn('❌ Error saving profile:', error)
+                console.warn('❌ Error saving profile:', error);
               }
-            }
-            saveProfile()
+            };
+            saveProfile();
           }
-        }, [connected, account?.address, profileSaved])
+        }, [connected, account?.address, context?.user]);
 
         return (
           <div
@@ -131,12 +140,12 @@ export function WalletButton({ onConnectClick }: { onConnectClick?: () => void }
                   >
                     {context?.user?.pfpUrl && (
                       <img
-                        src={context.user.pfpUrl}
+                        src={context?.user?.pfpUrl}
                         alt="PFP"
                         className="w-6 h-6 rounded-full object-cover"
                       />
                     )}
-                    {context?.user?.username || account.displayName}
+                    {context?.user?.username ?? account.displayName}
                     {chain.hasIcon && (
                       <div
                         style={{
@@ -168,8 +177,8 @@ export function WalletButton({ onConnectClick }: { onConnectClick?: () => void }
                     {context?.user && (
                       <div className="p-4 border-b border-gray-700">
                         <p className="text-xs text-gray-400">Farcaster User</p>
-                        <p className="text-sm text-white">@{context.user.username || 'Unknown'}</p>
-                        <p className="text-xs text-gray-400">FID: {context.user.fid}</p>
+                        <p className="text-sm text-white">@{context?.user?.username ?? 'Unknown'}</p>
+                        <p className="text-xs text-gray-400">FID: {context?.user?.fid ?? '—'}</p>
                       </div>
                     )}
                     <button

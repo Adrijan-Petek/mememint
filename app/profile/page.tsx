@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useAccount } from "wagmi";
 import { WalletButton } from "../components/WalletButton";
 import AdminDashboard from "../components/AdminDashboard";
@@ -31,15 +31,18 @@ export default function ProfilePage() {
   const [recasting, setRecasting] = useState(false);
   const pathname = usePathname();
   const { address, isConnected } = useAccount();
+  const searchParams = useSearchParams();
+  const queryAddress = searchParams?.get('address') ?? null;
 
   const { fetchLeaderboard, formatAddress } = useLeaderboard();
 
   useEffect(() => {
     loadUserProfile();
-  }, [address, isConnected]);
+  }, [address, isConnected, queryAddress]);
 
   const loadUserProfile = async () => {
-    if (!address || !isConnected) {
+    const targetAddress = queryAddress ?? address;
+    if (!targetAddress) {
       setLoading(false);
       return;
     }
@@ -49,10 +52,10 @@ export default function ProfilePage() {
 
       // Fetch user profile data
       const [profileResponse, rankResponse, pointsResponse, mintCountResponse] = await Promise.all([
-        fetch(`/api/profiles?address=${address}`),
-        fetch(`/api/leaderboard/user-rank?address=${address}`),
-        fetch(`/api/leaderboard/user-points?address=${address}`),
-        fetch(`/api/leaderboard/user-mint-count?address=${address}`)
+        fetch(`/api/profiles?address=${targetAddress}`),
+        fetch(`/api/leaderboard/user-rank?address=${targetAddress}`),
+        fetch(`/api/leaderboard/user-points?address=${targetAddress}`),
+        fetch(`/api/leaderboard/user-mint-count?address=${targetAddress}`)
       ]);
 
       const profileData = profileResponse.ok ? await profileResponse.json() : null;
@@ -65,13 +68,13 @@ export default function ProfilePage() {
       const leaderboardData = leaderboardResponse.ok ? await leaderboardResponse.json() : { data: [] };
 
       const userInLeaderboard = leaderboardData.data?.find((user: any) =>
-        user.user_address.toLowerCase() === address.toLowerCase()
+        user.user_address.toLowerCase() === targetAddress.toLowerCase()
       );
 
       setProfile({
-        address: address as `0x${string}`,
+        address: targetAddress as `0x${string}`,
         name: profileData?.username || 'Anonymous',
-        pfp: profileData?.pfp || `https://api.dicebear.com/7.x/avataaars/svg?seed=${address}`,
+        pfp: profileData?.pfp || `https://api.dicebear.com/7.x/avataaars/svg?seed=${targetAddress}`,
         fid: profileData?.fid || null,
         highScore: userInLeaderboard?.total_score || 0,
         lastScore: userInLeaderboard?.total_score || 0, // For now, same as high score
@@ -145,7 +148,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Bottom row: Navigation */}
-            <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] border-t border-white/5">
+            <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] pt-3">
               <nav className="flex gap-4 md:gap-6 items-center">
                 <Link
                   href="/"
@@ -197,7 +200,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Bottom row: Navigation */}
-          <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] border-t border-white/5">
+          <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] pt-3">
             <nav className="flex gap-4 md:gap-6 items-center">
               <Link
                 href="/"

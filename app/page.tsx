@@ -60,7 +60,7 @@ export default function Home() {
           </div>
 
           {/* Bottom row: Navigation */}
-          <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] border-t border-white/5">
+          <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] pt-3">
             <nav className="flex gap-4 md:gap-6 items-center">
               <Link
                 href="/"
