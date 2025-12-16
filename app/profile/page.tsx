@@ -153,6 +153,37 @@ export default function ProfilePage() {
     }
   };
 
+  // Memes (achievements) list with pagination + modal
+  const PAGE_SIZE = 6
+  const [memes, setMemes] = useState<Array<any>>([])
+  const [loadingMemes, setLoadingMemes] = useState(false)
+  const [hasMoreMemes, setHasMoreMemes] = useState(false)
+  const [selectedMeme, setSelectedMeme] = useState<any | null>(null)
+
+  const loadMemes = async (reset = false) => {
+    if (!profile?.address) return
+    try {
+      setLoadingMemes(true)
+      const offset = reset ? 0 : memes.length
+      const res = await fetch(`/api/memes?address=${profile.address}&limit=${PAGE_SIZE}&offset=${offset}`)
+      if (res.ok) {
+        const json = await res.json()
+        const items = json.data || []
+        setMemes(prev => reset ? items : [...prev, ...items])
+        setHasMoreMemes(items.length === PAGE_SIZE)
+      }
+    } catch (err) {
+      console.warn('Failed to load memes:', err)
+    } finally {
+      setLoadingMemes(false)
+    }
+  }
+
+  useEffect(() => {
+    setMemes([])
+    if (profile?.address) loadMemes(true)
+  }, [profile?.address])
+
   if (loading) {
     return (
       <div className="min-h-screen bg-app-bg bg-[400%_400%] animate-gradient-shift font-sans relative before:absolute before:inset-0 before:bg-hero-bg before:pointer-events-none before:opacity-80">
@@ -374,6 +405,98 @@ export default function ProfilePage() {
                   </div>
                 </div>
               </div>
+
+              {/* Generated memes grid */}
+              <h3 className="text-lg font-semibold text-white mt-6 mb-3">Your Memes</h3>
+              {memes.length === 0 ? (
+                <p className="text-white/60 text-center">No memes yet. Create one to showcase here.</p>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
+                    {memes.map((m: any) => (
+                      <div key={m.id} className="bg-white/3 rounded-lg overflow-hidden border border-white/10 cursor-pointer group" onClick={() => setSelectedMeme(m)}>
+                        <img src={m.image_url} alt={m.title || 'Meme'} className="w-full h-40 object-cover group-hover:scale-105 transition-transform" />
+                        <div className="p-2 flex items-center justify-between">
+                          <div className="text-sm text-white/90 truncate">{m.title || 'Meme'}</div>
+                          <button
+                            onClick={async (e) => {
+                              e.stopPropagation()
+                              try {
+                                await sdk.actions.composeCast({ text: `Check out my meme: ${m.title || ''}`, embeds: [m.image_url] })
+                                alert('Recasted!')
+                              } catch (err) {
+                                console.error('Recast failed', err)
+                                alert('Failed to recast')
+                              }
+                            }}
+                            className="text-xs bg-blue-500 px-2 py-1 rounded text-white"
+                          >
+                            Recast
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex justify-center mt-4">
+                    {hasMoreMemes ? (
+                      <button
+                        onClick={() => loadMemes(false)}
+                        disabled={loadingMemes}
+                        className="px-4 py-2 bg-white/6 text-white rounded-lg hover:bg-white/10"
+                      >
+                        {loadingMemes ? 'Loading...' : 'Load more'}
+                      </button>
+                    ) : (
+                      memes.length > 0 && <div className="text-white/60">End of list</div>
+                    )}
+                  </div>
+
+                  {/* Modal */}
+                  {selectedMeme && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+                      <div className="bg-gray-900 rounded-lg max-w-3xl w-full mx-4 overflow-hidden">
+                        <div className="p-3 flex items-center justify-between">
+                          <div className="text-white font-semibold">{selectedMeme.title || 'Meme'}</div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={async () => {
+                                try {
+                                  await sdk.actions.composeCast({ text: `Check out my meme: ${selectedMeme.title || ''}`, embeds: [selectedMeme.image_url] })
+                                  alert('Recasted!')
+                                } catch (err) {
+                                  console.error('Recast failed', err)
+                                  alert('Failed to recast')
+                                }
+                              }}
+                              className="px-3 py-1 bg-blue-500 text-white rounded"
+                            >
+                              Recast
+                            </button>
+                            <button
+                              onClick={async () => {
+                                try {
+                                  await navigator.clipboard.writeText(selectedMeme.image_url)
+                                  alert('Link copied')
+                                } catch (err) {
+                                  console.error('Copy failed', err)
+                                }
+                              }}
+                              className="px-3 py-1 bg-white/6 text-white rounded"
+                            >
+                              Copy Link
+                            </button>
+                            <button onClick={() => setSelectedMeme(null)} className="px-3 py-1 bg-red-600 text-white rounded">Close</button>
+                          </div>
+                        </div>
+                        <div className="p-4">
+                          <img src={selectedMeme.image_url} alt={selectedMeme.title || 'Meme'} className="w-full h-auto max-h-[70vh] object-contain mx-auto" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
         )}

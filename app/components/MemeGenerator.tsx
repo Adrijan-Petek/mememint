@@ -6,6 +6,7 @@ import { useMemeGeneration } from "../hooks/useMemeGeneration";
 import { useTemplates } from "../hooks/useTemplates";
 import { useMinting } from "../hooks/useMinting";
 import { shareToImgbb, downloadMeme } from "../utils/memeSharing";
+import { useAccount } from 'wagmi';
 
 interface MemeGeneratorProps {
   onShowAdminDashboard: () => void;
@@ -81,6 +82,9 @@ export default function MemeGenerator({ onShowAdminDashboard: _ }: MemeGenerator
 
   const { templates, selectedTemplate, setSelectedTemplate } = useTemplates();
 
+  const { address } = useAccount();
+  const lastSavedRef = useRef<string | null>(null);
+
   const { startMinting, resetMinting, isTransactionConfirmed } = useMinting();
 
   const [texts, setTexts] = useState<string[]>(["", ""]);
@@ -99,8 +103,30 @@ export default function MemeGenerator({ onShowAdminDashboard: _ }: MemeGenerator
   useEffect(() => {
     if (isTransactionConfirmed) {
       setShowShareDownload(true);
+
+      // Attempt to save the generated meme once to the DB
+      (async () => {
+        try {
+          const urlToSave = permanentMemeUrl || generatedMeme;
+          if (!urlToSave || !address) return;
+
+          // avoid duplicate saves for same URL
+          if (lastSavedRef.current === urlToSave) return;
+          lastSavedRef.current = urlToSave;
+
+          const title = `${selectedTemplate?.name || 'Meme'}${texts && texts.length ? ' - ' + texts.join(' | ') : ''}`;
+
+          await fetch('/api/memes/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ address: address.toLowerCase(), imageUrl: urlToSave, title })
+          });
+        } catch (err) {
+          console.error('Failed to save generated meme:', err);
+        }
+      })();
     }
-  }, [isTransactionConfirmed]);
+  }, [isTransactionConfirmed, permanentMemeUrl, generatedMeme, address, selectedTemplate, texts]);
 
   const previewUrl = useMemo(() => {
     if (!selectedTemplate) return null;
@@ -120,6 +146,8 @@ export default function MemeGenerator({ onShowAdminDashboard: _ }: MemeGenerator
   const handleGenerate = () => {
     if (!selectedTemplate) return;
     setShowShareDownload(false);
+    // reset saved flag for this generation
+    lastSavedRef.current = null;
     generate(selectedTemplate, texts, startMinting, {
       font,
       textColor,

@@ -1,49 +1,33 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server'
+import { sql } from '@/utils/database/server'
 
-interface MemegenTemplate {
-  id: string;
-  name: string;
-  lines: number;
-  overlays: number;
-  blank: string;
-}
-
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const response = await fetch('https://api.memegen.link/templates', {
-      headers: {
-        'Accept': 'application/json'
-      },
-      cache: 'no-store'
-    });
+    const { searchParams } = new URL(req.url)
+    const address = searchParams.get('address')
+    const limit = parseInt(searchParams.get('limit') || '12')
+    const offset = parseInt(searchParams.get('offset') || '0')
 
-    if (!response.ok) {
-      console.error('Failed to fetch memegen templates:', response.status, response.statusText);
-      return NextResponse.json({ error: 'Failed to fetch templates' }, { status: 502 });
+    if (!address) {
+      return NextResponse.json({ data: [] })
     }
 
-    const templates: MemegenTemplate[] = await response.json();
+    // Ensure table exists
+    await sql(`
+      CREATE TABLE IF NOT EXISTS memes (
+        id SERIAL PRIMARY KEY,
+        user_address TEXT NOT NULL,
+        image_url TEXT NOT NULL,
+        title TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+      );
+    `)
 
-    const normalized = templates.map(template => ({
-      id: template.id,
-      name: template.name,
-      url: template.blank,
-      width: 600,
-      height: 450,
-      lines: template.lines ?? 2
-    }));
+    const rows = await sql('SELECT id, user_address, image_url, title, created_at FROM memes WHERE user_address = $1 ORDER BY created_at DESC LIMIT $2 OFFSET $3', [address.toLowerCase(), limit, offset])
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        memes: normalized
-      }
-    }, { headers: { 'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400' } });
-  } catch (error) {
-    console.error('Error fetching memegen templates:', error);
-    return NextResponse.json({ 
-      error: 'Internal server error', 
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    return NextResponse.json({ data: Array.isArray(rows) ? rows : rows.rows || [] })
+  } catch (err) {
+    console.error('Error fetching memes:', err)
+    return NextResponse.json({ data: [] }, { status: 500 })
   }
 }
