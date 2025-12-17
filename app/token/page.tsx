@@ -36,17 +36,20 @@ export default function TokenPage() {
           </div>
 
           <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] pt-3 pb-2">
-            <nav className="flex gap-2 md:gap-6 items-center overflow-x-auto scrollbar-hide">
-              <Link href="/" className={`text-white/80 no-underline font-medium text-xs md:text-sm py-1.5 px-2 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 whitespace-nowrap ${pathname === '/' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 font-semibold' : ''}`}>
+            <nav className="flex gap-2 md:gap-4 lg:gap-6 items-center overflow-x-auto scrollbar-hide px-2">
+              <Link href="/" className={`text-white/80 no-underline font-medium text-xs md:text-sm py-1.5 px-2 md:px-3 lg:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 whitespace-nowrap ${pathname === '/' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 font-semibold' : ''}`}>
                     Create
                   </Link>
-              <Link href="/token" className={`text-white/80 no-underline font-medium text-xs md:text-sm py-1.5 px-2 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 whitespace-nowrap ${pathname?.startsWith('/token') ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 font-semibold' : ''}`}>
+              <Link href="/mint" className={`text-white/80 no-underline font-medium text-xs md:text-sm py-1.5 px-2 md:px-3 lg:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 whitespace-nowrap ${pathname === '/mint' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 font-semibold' : ''}`}>
+                Mint
+              </Link>
+              <Link href="/token" className={`text-white/80 no-underline font-medium text-xs md:text-sm py-1.5 px-2 md:px-3 lg:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 whitespace-nowrap ${pathname?.startsWith('/token') ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 font-semibold' : ''}`}>
                 Token
               </Link>
-              <Link href="/leaderboard" className={`text-white/80 no-underline font-medium text-xs md:text-sm py-1.5 px-2 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 whitespace-nowrap ${pathname === '/leaderboard' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 font-semibold' : ''}`}>
+              <Link href="/leaderboard" className={`text-white/80 no-underline font-medium text-xs md:text-sm py-1.5 px-2 md:px-3 lg:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 whitespace-nowrap ${pathname === '/leaderboard' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 font-semibold' : ''}`}>
                 Leaderboard
               </Link>
-              <Link href="/profile" className={`text-white/80 no-underline font-medium text-xs md:text-sm py-1.5 px-2 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 whitespace-nowrap ${pathname === '/profile' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 font-semibold' : ''}`}>
+              <Link href="/profile" className={`text-white/80 no-underline font-medium text-xs md:text-sm py-1.5 px-2 md:px-3 lg:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 whitespace-nowrap ${pathname === '/profile' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 font-semibold' : ''}`}>
                 Profile
               </Link>
             </nav>

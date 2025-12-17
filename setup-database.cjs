@@ -64,11 +64,43 @@ async function setupDatabase() {
     )`);
     console.log('✅ Created mint_counts table');
 
+    // Create drops table for NFT drops
+    console.log('Creating drops table...');
+    await nile.query(`CREATE TABLE IF NOT EXISTS drops (
+      id SERIAL PRIMARY KEY,
+      drop_id INTEGER UNIQUE NOT NULL,
+      name TEXT NOT NULL,
+      description TEXT NOT NULL,
+      price_wei TEXT NOT NULL,
+      supply INTEGER NOT NULL,
+      minted INTEGER DEFAULT 0 NOT NULL,
+      uri TEXT NOT NULL,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    )`);
+    console.log('✅ Created drops table');
+
+    // Create nft_mints table
+    console.log('Creating nft_mints table...');
+    await nile.query(`CREATE TABLE IF NOT EXISTS nft_mints (
+      id SERIAL PRIMARY KEY,
+      user_address TEXT NOT NULL,
+      drop_id INTEGER NOT NULL,
+      token_id INTEGER NOT NULL,
+      amount INTEGER NOT NULL,
+      tx_hash TEXT NOT NULL,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    )`);
+    console.log('✅ Created nft_mints table');
+
     // Create indexes
     console.log('Creating indexes...');
     await nile.query(`CREATE INDEX IF NOT EXISTS idx_scores_user_address ON scores(user_address)`);
     await nile.query(`CREATE INDEX IF NOT EXISTS idx_scores_created_at ON scores(created_at DESC)`);
     await nile.query(`CREATE INDEX IF NOT EXISTS idx_mint_counts_user_address ON mint_counts(user_address)`);
+    await nile.query(`CREATE INDEX IF NOT EXISTS idx_drops_drop_id ON drops(drop_id)`);
+    await nile.query(`CREATE INDEX IF NOT EXISTS idx_nft_mints_user_address ON nft_mints(user_address)`);
+    await nile.query(`CREATE INDEX IF NOT EXISTS idx_nft_mints_drop_id ON nft_mints(drop_id)`);
+    await nile.query(`CREATE INDEX IF NOT EXISTS idx_nft_mints_created_at ON nft_mints(created_at DESC)`);
     console.log('✅ Created indexes');
 
     console.log('\n🎉 Database setup complete! Tables and indexes created successfully.');

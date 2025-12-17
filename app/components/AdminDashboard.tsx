@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAdminContract } from '../hooks/useAdminContract';
 import dynamic from 'next/dynamic';
-
-const TreasuryTokenBalance = dynamic(() => import('./TreasuryTokenBalance'), { ssr: false });
-
+import { useWriteContract } from 'wagmi';
 import { CONTRACT_ADDRESSES } from "../contracts/addresses";
+import { NFT_ABI } from "../contracts/NFTABI";
+import { parseEther } from 'viem';
+import TreasuryTokenBalance from './TreasuryTokenBalance';
 
 interface AdminDashboardProps {
   isVisible: boolean;
@@ -20,8 +21,15 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
   const [resetAddress, setResetAddress] = useState('');
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [templates, setTemplates] = useState<Templates>({ images: [] });
-  const [activeTab, setActiveTab] = useState<'controls' | 'templates' | 'treasury'>('controls');
+  const [activeTab, setActiveTab] = useState<'controls' | 'templates' | 'treasury' | 'nft-drops'>('controls');
   const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
+  const [dropId, setDropId] = useState('');
+  const [dropName, setDropName] = useState('');
+  const [dropDescription, setDropDescription] = useState('');
+  const [priceEth, setPriceEth] = useState('');
+  const [supply, setSupply] = useState('');
+  const [uri, setUri] = useState('');
+  const [isCreatingDrop, setIsCreatingDrop] = useState(false);
 
   // Use the admin contract hook
   const {
@@ -84,6 +92,9 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
     handleUnpauseTreasury,
     handleSetTreasuryAddress,
   } = useAdminContract();
+
+  // NFT contract write hook
+  const { writeContractAsync } = useWriteContract();
 
   // Load templates
   useEffect(() => {
@@ -183,6 +194,63 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
     }
   };
 
+  const handleCreateDrop = async () => {
+    if (!dropId || !dropName || !dropDescription || !priceEth || !supply || !uri) {
+      alert('Please fill all fields');
+      return;
+    }
+
+    try {
+      setIsCreatingDrop(true);
+
+      // Call contract createDrop
+      const txHash = await writeContractAsync({
+        address: CONTRACT_ADDRESSES.nft,
+        abi: NFT_ABI,
+        functionName: 'createDrop',
+        args: [
+          BigInt(dropId),
+          parseEther(priceEth),
+          BigInt(supply),
+          uri,
+        ],
+      });
+
+      // Save to DB
+      const response = await fetch('/api/db/drops', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dropId: parseInt(dropId),
+          name: dropName,
+          description: dropDescription,
+          priceWei: parseEther(priceEth).toString(),
+          supply: parseInt(supply),
+          uri,
+          txHash,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert(`Drop created successfully! TX: ${txHash}`);
+        setDropId('');
+        setDropName('');
+        setDropDescription('');
+        setPriceEth('');
+        setSupply('');
+        setUri('');
+      } else {
+        alert(`Failed to save drop: ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Error creating drop:', error);
+      alert('Failed to create drop');
+    } finally {
+      setIsCreatingDrop(false);
+    }
+  };
+
   if (!isVisible || !isOwner) {
     return null;
   }
@@ -214,6 +282,12 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
             onClick={() => setActiveTab('templates')}
           >
             🎨 Templates
+          </button>
+          <button 
+            className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200 ${activeTab === 'nft-drops' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+            onClick={() => setActiveTab('nft-drops')}
+          >
+            🖼️ NFT Drops
           </button>
         </div>
 
@@ -643,6 +717,83 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
                       </div>
                     ))
                   )}
+                </div>
+              </div>
+            </>
+          )}
+
+          {activeTab === 'nft-drops' && (
+            <>
+              <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-600">
+                <h3 className="text-xl font-bold text-white mb-4">🖼️ Create NFT Drop</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Drop ID</label>
+                    <input
+                      type="number"
+                      value={dropId}
+                      onChange={(e) => setDropId(e.target.value)}
+                      className="w-full px-4 py-2 bg-slate-700 border border-slate-500 rounded-lg text-white"
+                      placeholder="e.g., 1"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Name</label>
+                    <input
+                      type="text"
+                      value={dropName}
+                      onChange={(e) => setDropName(e.target.value)}
+                      className="w-full px-4 py-2 bg-slate-700 border border-slate-500 rounded-lg text-white"
+                      placeholder="e.g., Rare Pepe Meme"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Description</label>
+                    <textarea
+                      value={dropDescription}
+                      onChange={(e) => setDropDescription(e.target.value)}
+                      className="w-full px-4 py-2 bg-slate-700 border border-slate-500 rounded-lg text-white"
+                      placeholder="e.g., A rare Pepe meme NFT from the golden era"
+                      rows={3}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Price (ETH)</label>
+                    <input
+                      type="text"
+                      value={priceEth}
+                      onChange={(e) => setPriceEth(e.target.value)}
+                      className="w-full px-4 py-2 bg-slate-700 border border-slate-500 rounded-lg text-white"
+                      placeholder="e.g., 0.1"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">Supply</label>
+                    <input
+                      type="number"
+                      value={supply}
+                      onChange={(e) => setSupply(e.target.value)}
+                      className="w-full px-4 py-2 bg-slate-700 border border-slate-500 rounded-lg text-white"
+                      placeholder="e.g., 1000"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-1">IPFS URI</label>
+                    <input
+                      type="text"
+                      value={uri}
+                      onChange={(e) => setUri(e.target.value)}
+                      className="w-full px-4 py-2 bg-slate-700 border border-slate-500 rounded-lg text-white"
+                      placeholder="ipfs://..."
+                    />
+                  </div>
+                  <button
+                    onClick={handleCreateDrop}
+                    disabled={isCreatingDrop}
+                    className="w-full px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                  >
+                    {isCreatingDrop ? 'Creating...' : 'Create Drop'}
+                  </button>
                 </div>
               </div>
             </>
