@@ -75,8 +75,18 @@ async function setupDatabase() {
       supply INTEGER NOT NULL,
       minted INTEGER DEFAULT 0 NOT NULL,
       uri TEXT NOT NULL,
+      tx_hash TEXT,
       created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
     )`);
+    
+    // Add tx_hash column if it doesn't exist (for existing tables)
+    try {
+      await nile.query(`ALTER TABLE drops ADD COLUMN IF NOT EXISTS tx_hash TEXT`);
+      console.log('✅ Added tx_hash column to drops table');
+    } catch (error) {
+      console.log('Note: tx_hash column may already exist or ALTER TABLE not supported');
+    }
+    
     console.log('✅ Created drops table');
 
     // Create nft_mints table

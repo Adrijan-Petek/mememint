@@ -30,6 +30,10 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
   const [supply, setSupply] = useState('');
   const [uri, setUri] = useState('');
   const [isCreatingDrop, setIsCreatingDrop] = useState(false);
+  const [savedDrops, setSavedDrops] = useState<any[]>([]);
+  const [editingDrop, setEditingDrop] = useState<any | null>(null);
+  const [editPrice, setEditPrice] = useState('');
+  const [isLoadingDrops, setIsLoadingDrops] = useState(false);
 
   // Use the admin contract hook
   const {
@@ -102,6 +106,13 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
       loadTemplates();
     }
   }, [isVisible, isOwner]);
+
+  // Load drops when NFT drops tab is selected
+  useEffect(() => {
+    if (isVisible && isOwner && activeTab === 'nft-drops') {
+      loadDrops();
+    }
+  }, [isVisible, isOwner, activeTab]);
 
   const loadTemplates = async () => {
     try {
@@ -202,6 +213,7 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
 
     try {
       setIsCreatingDrop(true);
+      console.log('Creating drop with params:', { dropId, dropName, priceEth, supply, uri });
 
       // Call contract createDrop
       const txHash = await writeContractAsync({
@@ -216,14 +228,132 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
         ],
       });
 
+      console.log('Contract call successful, txHash:', txHash);
+
       // Save to DB
+      const dbPayload = {
+        dropId: parseInt(dropId),
+        name: dropName,
+        description: dropDescription,
+        priceWei: parseEther(priceEth).toString(),
+        supply: parseInt(supply),
+        uri,
+        txHash,
+      };
+      console.log('Saving to DB with payload:', dbPayload);
+
+      const response = await fetch('/api/db/drops', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dbPayload),
+      });
+
+      const data = await response.json();
+      console.log('DB response:', data);
+
+      if (data.success) {
+        alert(`Drop created successfully! TX: ${txHash}`);
+        setDropId('');
+        setDropName('');
+        setDropDescription('');
+        setPriceEth('');
+        setSupply('');
+        setUri('');
+        loadDrops(); // Refresh the drops list
+      } else {
+        alert(`Failed to save drop: ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Error creating drop:', error);
+      alert(`Failed to create drop: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setIsCreatingDrop(false);
+    }
+  };
+
+  const loadDrops = async () => {
+    try {
+      setIsLoadingDrops(true);
+      const response = await fetch('/api/db/drops');
+      const data = await response.json();
+      if (data.drops) {
+        setSavedDrops(data.drops);
+      }
+    } catch (error) {
+      console.error('Error loading drops:', error);
+    } finally {
+      setIsLoadingDrops(false);
+    }
+  };
+
+  const handleEditDropPrice = async (drop: any) => {
+    if (!editPrice) {
+      alert('Please enter a new price');
+      return;
+    }
+
+    try {
+      // Update contract price
+      await writeContractAsync({
+        address: CONTRACT_ADDRESSES.nft,
+        abi: NFT_ABI,
+        functionName: 'updateDropPrice',
+        args: [
+          BigInt(drop.drop_id),
+          parseEther(editPrice),
+        ],
+      });
+
+      // Update DB
+      const response = await fetch('/api/db/drops', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dropId: drop.drop_id,
+          priceWei: parseEther(editPrice).toString(),
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert('Drop price updated successfully!');
+        setEditingDrop(null);
+        setEditPrice('');
+        loadDrops(); // Refresh the drops list
+      } else {
+        alert(`Failed to update drop price: ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Error updating drop price:', error);
+      alert('Failed to update drop price');
+    }
+  };
+
+  const handleSaveExistingDrop = async () => {
+    const txHash = prompt('Enter the transaction hash of the drop creation:');
+    if (!txHash) return;
+
+    try {
+      // Try to get drop info from the transaction or prompt for manual entry
+      const dropId = prompt('Enter drop ID:');
+      const name = prompt('Enter drop name:');
+      const description = prompt('Enter drop description:');
+      const priceEth = prompt('Enter price in ETH:');
+      const supply = prompt('Enter supply:');
+      const uri = prompt('Enter IPFS URI:');
+
+      if (!dropId || !name || !description || !priceEth || !supply || !uri) {
+        alert('All fields are required');
+        return;
+      }
+
       const response = await fetch('/api/db/drops', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           dropId: parseInt(dropId),
-          name: dropName,
-          description: dropDescription,
+          name,
+          description,
           priceWei: parseEther(priceEth).toString(),
           supply: parseInt(supply),
           uri,
@@ -233,21 +363,14 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
 
       const data = await response.json();
       if (data.success) {
-        alert(`Drop created successfully! TX: ${txHash}`);
-        setDropId('');
-        setDropName('');
-        setDropDescription('');
-        setPriceEth('');
-        setSupply('');
-        setUri('');
+        alert('Drop saved successfully!');
+        loadDrops(); // Refresh the drops list
       } else {
         alert(`Failed to save drop: ${data.error}`);
       }
     } catch (error) {
-      console.error('Error creating drop:', error);
-      alert('Failed to create drop');
-    } finally {
-      setIsCreatingDrop(false);
+      console.error('Error saving drop:', error);
+      alert('Failed to save drop');
     }
   };
 
@@ -724,6 +847,21 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
 
           {activeTab === 'nft-drops' && (
             <>
+              {/* Manual Save Drop */}
+              <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-600">
+                <h3 className="text-xl font-bold text-white mb-4">💾 Save Existing Drop</h3>
+                <p className="text-gray-400 text-sm mb-4">
+                  Use this to save drops that were created on-chain but not saved to the database.
+                </p>
+                <button
+                  onClick={handleSaveExistingDrop}
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors duration-200"
+                >
+                  Save Existing Drop
+                </button>
+              </div>
+
+              {/* Create NFT Drop */}
               <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-600">
                 <h3 className="text-xl font-bold text-white mb-4">🖼️ Create NFT Drop</h3>
                 <div className="space-y-4">
@@ -795,6 +933,86 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
                     {isCreatingDrop ? 'Creating...' : 'Create Drop'}
                   </button>
                 </div>
+              </div>
+
+              {/* Saved Drops */}
+              <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-600">
+                <h3 className="text-xl font-bold text-white mb-4">📋 Saved Drops ({savedDrops.length})</h3>
+                {isLoadingDrops ? (
+                  <p className="text-gray-400">Loading drops...</p>
+                ) : savedDrops.length === 0 ? (
+                  <p className="text-gray-400">No saved drops</p>
+                ) : (
+                  <div className="space-y-4">
+                    {savedDrops.map((drop) => (
+                      <div key={drop.drop_id} className="bg-slate-700/50 p-4 rounded-lg">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <h4 className="text-white font-semibold">#{drop.drop_id} - {drop.name}</h4>
+                            <p className="text-gray-400 text-sm">{drop.description}</p>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-blue-400 font-semibold">
+                              {parseFloat(drop.price_wei) / 1e18} ETH
+                            </div>
+                            <div className="text-gray-400 text-sm">
+                              {drop.minted}/{drop.supply} minted
+                            </div>
+                          </div>
+                        </div>
+
+                        {editingDrop?.drop_id === drop.drop_id ? (
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={editPrice}
+                              onChange={(e) => setEditPrice(e.target.value)}
+                              className="flex-1 px-3 py-1 bg-slate-600 border border-slate-500 rounded text-white text-sm"
+                              placeholder="New price in ETH"
+                            />
+                            <button
+                              onClick={() => handleEditDropPrice(drop)}
+                              className="px-3 py-1 bg-green-600 text-white rounded text-sm font-semibold hover:bg-green-700"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={() => {
+                                setEditingDrop(null);
+                                setEditPrice('');
+                              }}
+                              className="px-3 py-1 bg-gray-600 text-white rounded text-sm font-semibold hover:bg-gray-700"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setEditingDrop(drop);
+                                setEditPrice((parseFloat(drop.price_wei) / 1e18).toString());
+                              }}
+                              className="px-3 py-1 bg-blue-600 text-white rounded text-sm font-semibold hover:bg-blue-700"
+                            >
+                              Edit Price
+                            </button>
+                            {drop.tx_hash && (
+                              <a
+                                href={`https://basescan.org/tx/${drop.tx_hash}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-3 py-1 bg-purple-600 text-white rounded text-sm font-semibold hover:bg-purple-700"
+                              >
+                                View TX
+                              </a>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </>
           )}
