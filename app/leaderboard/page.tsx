@@ -7,27 +7,11 @@ import { WalletButton } from "../components/WalletButton";
 import AdminDashboard from "../components/AdminDashboard";
 import { useLeaderboard } from "../hooks/useScoring";
 
-// Scoring system display component
 function ScoringSystem() {
-  const scoringItems = [
-    { action: "Generate Meme", points: 150, icon: "🎨" },
-    { action: "Play Game", points: 200, icon: "🎮" },
-    { action: "Buy Token", points: 50, icon: "💰" },
-    { action: "Hold Token", points: 1000, icon: "🏆" },
-  ];
-
   return (
-    <div className="bg-white/5 backdrop-blur-[20px] border border-white/10 rounded-2xl p-4 mb-6 shadow-2xl md:p-3 sm:p-2">
-      <h2 className="text-xl font-bold text-white mb-3 text-center md:text-lg sm:text-base">🎯 Scoring System</h2>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-2 sm:gap-1">
-        {scoringItems.map((item, index) => (
-          <div key={index} className="text-center p-3 bg-white/5 rounded-lg border border-white/10 md:p-2 sm:p-1.5">
-            <div className="text-2xl mb-1 md:text-xl sm:text-lg">{item.icon}</div>
-            <div className="text-xs text-white/80 font-medium md:text-xs sm:text-xs">{item.action}</div>
-            <div className="text-lg font-bold text-blue-400 md:text-base sm:text-sm">+{item.points}</div>
-          </div>
-        ))}
-      </div>
+    <div className="mb-6">
+      <div className="text-sm text-white/70">Scoring system:</div>
+      <div className="text-xs text-white/60">Points are awarded for meme creations and interactions.</div>
     </div>
   );
 }
@@ -121,28 +105,16 @@ export default function LeaderboardPage() {
             {/* Bottom row: Navigation */}
             <div className="flex justify-center items-center min-h-[40px] md:min-h-[35px] pt-3">
               <nav className="flex gap-4 md:gap-6 items-center">
-                <Link
-                  href="/"
-                  className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${
-                    pathname === '/' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''
-                  }`}
-                >
-                  Home
+                <Link href="/" className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${pathname === '/' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''}`}>
+                  Create
                 </Link>
-                <Link
-                  href="/leaderboard"
-                  className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${
-                    pathname === '/leaderboard' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''
-                  }`}
-                >
+                <Link href="/token" className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${pathname?.startsWith('/token') ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''}`}>
+                  Token
+                </Link>
+                <Link href="/leaderboard" className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${pathname === '/leaderboard' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''}`}>
                   Leaderboard
                 </Link>
-                <Link
-                  href="/profile"
-                  className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${
-                    pathname === '/profile' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''
-                  }`}
-                >
+                <Link href="/profile" className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${pathname === '/profile' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''}`}>
                   Profile
                 </Link>
               </nav>
@@ -186,7 +158,10 @@ export default function LeaderboardPage() {
                     pathname === '/' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''
                   }`}
                 >
-                  Home
+                  Create
+                </Link>
+                <Link href="/token" className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${pathname?.startsWith('/token') ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''}`}>
+                  Token
                 </Link>
                 <Link
                   href="/leaderboard"
@@ -195,6 +170,9 @@ export default function LeaderboardPage() {
                   }`}
                 >
                   Leaderboard
+                </Link>
+                <Link href="/profile" className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${pathname === '/profile' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''}`}>
+                  Profile
                 </Link>
               </nav>
             </div>
@@ -236,7 +214,10 @@ export default function LeaderboardPage() {
                   pathname === '/' ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''
                 }`}
               >
-                Home
+                  Create
+              </Link>
+              <Link href="/token" className={`text-white/80 no-underline font-medium text-sm md:text-sm py-1.5 px-3 md:px-4 rounded-lg transition-all duration-300 ease-out relative overflow-hidden tracking-wide uppercase hover:text-white hover:bg-white/12 hover:-translate-y-0.5 hover:shadow-[0_8px_25px_rgba(255,255,255,0.1)] ${pathname?.startsWith('/token') ? 'text-white bg-gradient-to-br from-blue-500/30 to-purple-600/30 border border-blue-500/40 shadow-[0_8px_32px_rgba(59,130,246,0.3)] font-semibold' : ''}`}>
+                Token
               </Link>
               <Link
                 href="/leaderboard"
@@ -259,7 +240,7 @@ export default function LeaderboardPage() {
         </div>
       </header>
 
-      <main className="p-4 max-w-7xl mx-auto pt-24 md:p-2 md:pt-20 sm:p-1 sm:pt-16">
+      <main className="p-4 max-w-4xl mx-auto pt-24 md:p-2 md:pt-20 sm:p-1 sm:pt-16">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-extrabold bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-3 -tracking-wider drop-shadow-[0_0_30px_rgba(96,165,250,0.3)] md:text-3xl sm:text-2xl">🏆 Top Scorers Leaderboard</h1>
           <p className="text-lg text-white/80 font-normal md:text-base sm:text-sm">Compete to be among the top 100 meme generators and gamers!</p>

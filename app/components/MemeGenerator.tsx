@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef, useCallback, startTransition } from "react";
 import Image from "next/image";
 import { useMemeGeneration } from "../hooks/useMemeGeneration";
 import { useTemplates } from "../hooks/useTemplates";
@@ -128,20 +128,30 @@ export default function MemeGenerator({ onShowAdminDashboard: _ }: MemeGenerator
     }
   }, [isTransactionConfirmed, permanentMemeUrl, generatedMeme, address, selectedTemplate, texts]);
 
+  // Debounced preview tick prevents recomputing a new URL on every keystroke
+  const [previewTick, setPreviewTick] = useState<number>(Date.now());
+  useEffect(() => {
+    // wait a short time after the last change before updating cache-buster
+    const id = setTimeout(() => setPreviewTick(Date.now()), 250);
+    return () => clearTimeout(id);
+  }, [selectedTemplate?.id, texts, extension, font, textColor]);
+
   const previewUrl = useMemo(() => {
     if (!selectedTemplate) return null;
     const baseUrl = buildPreviewUrl(selectedTemplate.id, texts, extension, font, textColor);
-    // Add cache-busting parameter to ensure color changes are reflected
-    return `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}t=${Date.now()}`;
-  }, [selectedTemplate, texts, extension, font, textColor]);
+    return `${baseUrl}${baseUrl.includes("?") ? "&" : "?"}t=${previewTick}`;
+  }, [selectedTemplate, texts, extension, font, textColor, previewTick]);
 
-  const handleTextChange = (index: number, value: string) => {
-    setTexts(prev => {
-      const next = [...prev];
-      next[index] = value;
-      return next;
+  const handleTextChange = useCallback((index: number, value: string) => {
+    // mark this update as non-urgent to avoid blocking rendering (helps INP)
+    startTransition(() => {
+      setTexts(prev => {
+        const next = [...prev];
+        next[index] = value;
+        return next;
+      });
     });
-  };
+  }, []);
 
   const handleGenerate = () => {
     if (!selectedTemplate) return;

@@ -7,6 +7,20 @@ import { MEME_MINT_ABI } from "../contracts/MemeMintABI";
 import { CONTRACT_ADDRESSES } from "../contracts/addresses";
 import { useScoring } from "./useScoring";
 
+// Optional: Builder Code suffix for ERC-8021 attribution.
+// Set `NEXT_PUBLIC_BUILDER_CODE` in your environment (e.g., .env.local) to include the builder code in transaction calldata.
+const BUILDER_CODE = process.env.NEXT_PUBLIC_BUILDER_CODE || 'bc_ah5nub0w';
+
+function encodeBuilderCodeToHex(code: string) {
+  try {
+    const encoder = new TextEncoder();
+    const bytes = encoder.encode(code);
+    return '0x' + Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+  } catch (e) {
+    return '';
+  }
+}
+
 export function useMinting() {
   const [waitingForConfirmation, setWaitingForConfirmation] = useState(false);
   const { address, chain, isConnected } = useAccount();
@@ -99,6 +113,9 @@ export function useMinting() {
           console.log('  Value:', generationFee.toString(), 'wei (', formatEther(generationFee), 'ETH)');
           console.log('  Gas Limit:', '200000');
           
+          const rawHex = encodeBuilderCodeToHex(BUILDER_CODE);
+          const dataSuffixHex = rawHex ? (rawHex as `0x${string}`) : undefined;
+
           writeContract({
             address: CONTRACT_ADDRESSES.mememint as `0x${string}`,
             abi: MEME_MINT_ABI,
@@ -107,6 +124,8 @@ export function useMinting() {
             value: generationFee as bigint,
             account: address,
             chain: base,
+            // append builder code as dataSuffix for ERC-8021 attribution if available
+            ...(dataSuffixHex ? { dataSuffix: dataSuffixHex } : {}),
           });
           console.log('✅ Transaction submitted to wallet');
         } catch (error) {

@@ -12,12 +12,12 @@ export async function GET(request: NextRequest) {
 
     // Get user total points
     const result = await sql(`
-      SELECT COALESCE(SUM(s.points), 0) + (COALESCE(mc.count, 0) * 150) as total_points
+      SELECT COALESCE(SUM(s.points), 0) + (COALESCE(MAX(mc.count), 0) * 150) as total_points
       FROM users u
       LEFT JOIN scores s ON u.address = s.user_address
       LEFT JOIN mint_counts mc ON u.address = mc.user_address
       WHERE u.address = $1
-      GROUP BY u.address, mc.count
+      GROUP BY u.address
     `, [userAddress.toLowerCase()]);
 
     // Ensure result is an array and get first row

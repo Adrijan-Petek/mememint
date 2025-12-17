@@ -1,6 +1,6 @@
 "use client";
-import { useState } from 'react';
-import { useAccount, useReadContract, useWriteContract, useBalance } from 'wagmi';
+import { useState, useEffect } from 'react';
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useBalance } from 'wagmi';
 import { parseEther, formatEther } from 'viem';
 import { MEME_MINT_ABI } from "../contracts/MemeMintABI";
 import { TREASURY_ABI } from "../contracts/TreasuryABI";
@@ -90,7 +90,24 @@ export function useAdminContract() {
     });
   };
 
-  const { writeContract } = useWriteContract();
+  const { writeContract, writeContractAsync } = useWriteContract();
+
+  const [addTokenHash, setAddTokenHash] = useState<`0x${string}` | undefined>(undefined);
+  const { data: addTokenReceipt, isSuccess: isAddTokenConfirmed } = useWaitForTransactionReceipt({
+    hash: addTokenHash,
+  });
+
+  // Clear inputs and notify when add token tx confirmed
+  useEffect(() => {
+    if (isAddTokenConfirmed && addTokenReceipt) {
+      setNewTokenAddress('');
+      setNewTokenSymbol('');
+      setNewTokenImage('');
+      setAddTokenHash(undefined);
+      console.log('Add token transaction confirmed:', addTokenReceipt);
+      alert('Token added successfully (transaction confirmed)');
+    }
+  }, [isAddTokenConfirmed, addTokenReceipt]);
 
   // Check if current user is owner of either contract
   const isOwner = address && ((owner && address.toLowerCase() === owner.toLowerCase()) || (treasuryOwner && address.toLowerCase() === treasuryOwner.toLowerCase()));
@@ -166,20 +183,35 @@ export function useAdminContract() {
 
   // Treasury contract functions
   const handleAddSupportedToken = async () => {
-    if (!newTokenAddress || !newTokenSymbol || !newTokenImage) return;
+    const tokenAddr = newTokenAddress.trim();
+    const symbol = newTokenSymbol.trim();
+    const image = newTokenImage.trim();
+
+    if (!tokenAddr || !symbol || !image) return;
+
+    // Basic address validation
+    if (!/^0x[a-fA-F0-9]{40}$/.test(tokenAddr)) {
+      console.error('Invalid token address format');
+      alert('Invalid token address');
+      return;
+    }
+
     try {
       setIsLoading(true);
-      await writeContract({
+      const hash = await writeContractAsync({
         address: TREASURY_ADDRESS,
         abi: TREASURY_ABI,
         functionName: 'addSupportedToken',
-        args: [newTokenAddress as `0x${string}`, newTokenSymbol, newTokenImage],
+        args: [tokenAddr as `0x${string}`, symbol, image],
       });
-      setNewTokenAddress('');
-      setNewTokenSymbol('');
-      setNewTokenImage('');
-    } catch (error) {
+
+      // writeContractAsync should return the tx hash
+      setAddTokenHash((hash as unknown as `0x${string}`) || undefined);
+      console.log('Add token tx submitted, hash:', hash);
+    } catch (error: any) {
       console.error('Error adding token:', error);
+      const msg = error?.message || String(error);
+      alert(`Failed to add token: ${msg}`);
     } finally {
       setIsLoading(false);
     }

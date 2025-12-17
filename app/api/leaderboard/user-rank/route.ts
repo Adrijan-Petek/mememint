@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
       SELECT rank FROM (
         SELECT
           u.address,
-          ROW_NUMBER() OVER (ORDER BY (COALESCE(SUM(s.points), 0) + (COALESCE(mc.count, 0) * 150)) DESC) as rank
+          ROW_NUMBER() OVER (ORDER BY (COALESCE(SUM(s.points), 0) + (COALESCE(MAX(mc.count), 0) * 150)) DESC) as rank
         FROM users u
         LEFT JOIN scores s ON u.address = s.user_address
         LEFT JOIN mint_counts mc ON u.address = mc.user_address
