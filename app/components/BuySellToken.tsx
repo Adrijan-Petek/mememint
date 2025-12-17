@@ -34,13 +34,13 @@ export default function SwapToken({ defaultMode }: { defaultMode?: 'buy' | 'sell
     let mounted = true;
     async function fetchMeta() {
       try {
-        // Symbol
-        const symbolRes = await fetch(`/api/static/erc20-meta?address=${tokenAddress}`);
-        if (symbolRes.ok) {
-          const json = await symbolRes.json();
-          if (mounted && json?.symbol) setTokenSymbol(json.symbol || 'MEMEMINT');
-          if (mounted && json?.decimals) setTokenDecimals(Number(json.decimals));
-        }
+        // Symbol - API not implemented, using defaults
+        // const symbolRes = await fetch(`/api/static/erc20-meta?address=${tokenAddress}`);
+        // if (symbolRes.ok) {
+        //   const json = await symbolRes.json();
+        //   if (mounted && json?.symbol) setTokenSymbol(json.symbol || 'MEMEMINT');
+        //   if (mounted && json?.decimals) setTokenDecimals(Number(json.decimals));
+        // }
       } catch (e) {
         // ignore
       }
@@ -118,7 +118,7 @@ export default function SwapToken({ defaultMode }: { defaultMode?: 'buy' | 'sell
       <div className="grid grid-cols-1 gap-3 mb-6 sm:grid-cols-2">
         <div className="p-4 bg-white/3 rounded-lg border border-white/5">
           <div className="text-xs text-white/60 uppercase tracking-wide">ETH Balance</div>
-          <div className="text-xl text-white mt-1 font-semibold">{ethBalance?.formatted ?? '—'} {ethBalance?.symbol ?? 'ETH'}</div>
+          <div className="text-xl text-white mt-1 font-semibold">{ethBalance ? parseFloat(ethBalance.formatted).toFixed(5) : '—'} {ethBalance?.symbol ?? 'ETH'}</div>
         </div>
 
         <div className="p-4 bg-white/3 rounded-lg border border-white/5">

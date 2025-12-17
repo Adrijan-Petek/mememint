@@ -1,0 +1,21 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjM2MjEsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHgyY2Q4NWEwOTMyNjFmNTkyNzA4MDRBNkVBNjk3Q2VBNENlQkVjYWZFIn0",
+    "payload": "eyJkb21haW4iOiJtZW1lbWludC1vbmUudmVyY2VsLmFwcCJ9",
+    "signature": "D7urCIelYBtFc12UkEw/VOE1rkGKMdmDqAP/6s7sLWNfjhyug8pQCTM68XVJ8Gal6eBZxvtFE4RpVwqDtnLrzhs="
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "MemeMint",
+    "iconUrl": "https://mememint-one.vercel.app/icon.png",
+    "homeUrl": "https://mememint-one.vercel.app",
+    "imageUrl": "https://mememint-one.vercel.app/hero.png",
+    "buttonTitle": "Open MemeMint",
+    "splashImageUrl": "https://mememint-one.vercel.app/splash.png",
+    "splashBackgroundColor": "#000000",
+    "primaryCategory": "social",
+    "description": "Create and mint memes on Farcaster",
+    "requiredChains": ["eip155:8453"],
+    "requiredCapabilities": ["wallet.getEthereumProvider", "actions.composeCast"]
+  }
+}
