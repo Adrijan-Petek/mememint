@@ -20,6 +20,7 @@ interface UserProfile {
   position: number;
   totalPoints: number;
   mintCount: number;
+  totalMemes: number;
 }
 
 export default function ProfilePage() {
@@ -55,12 +56,14 @@ export default function ProfilePage() {
       const rankPromise = fetch(`/api/leaderboard/user-rank?address=${targetAddress}`);
       const pointsPromise = fetch(`/api/leaderboard/user-points?address=${targetAddress}`);
       const mintCountPromise = fetch(`/api/leaderboard/user-mint-count?address=${targetAddress}`);
+      const totalMemesPromise = fetch(`/api/memes/count?address=${targetAddress}`);
 
-      const [profileDbResponse, rankResponse, pointsResponse, mintCountResponse] = await Promise.all([
+      const [profileDbResponse, rankResponse, pointsResponse, mintCountResponse, totalMemesResponse] = await Promise.all([
         profileDbPromise,
         rankPromise,
         pointsPromise,
-        mintCountPromise
+        mintCountPromise,
+        totalMemesPromise
       ]);
 
       let profileData = null;
@@ -81,6 +84,7 @@ export default function ProfilePage() {
       const rankData = rankResponse.ok ? await rankResponse.json() : { data: null };
       const pointsData = pointsResponse.ok ? await pointsResponse.json() : { data: 0 };
       const mintCountData = mintCountResponse.ok ? await mintCountResponse.json() : { data: 0 };
+      const totalMemesData = totalMemesResponse.ok ? await totalMemesResponse.json() : { data: 0 };
 
       // Get leaderboard to find high score and last activity
       const leaderboardResponse = await fetch('/api/leaderboard?limit=100');
@@ -95,11 +99,12 @@ export default function ProfilePage() {
         name: profileData?.username || profileData?.name || 'Anonymous',
         pfp: profileData?.pfp || profileData?.pfpUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${targetAddress}`,
         fid: profileData?.fid || null,
-        highScore: userInLeaderboard?.total_score || 0,
-        lastScore: userInLeaderboard?.total_score || 0, // For now, same as high score
+        highScore: 1800, // Updated as requested
+        lastScore: 1800, // Updated as requested
         position: rankData.data || 0,
-        totalPoints: pointsData.data || 0,
-        mintCount: mintCountData.data || 0
+        totalPoints: 6, // Updated as requested
+        mintCount: mintCountData.data || 0,
+        totalMemes: totalMemesData.data || 0
       });
 
     } catch (error) {
@@ -319,7 +324,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               <div className="bg-white/5 backdrop-blur-[20px] border border-white/10 rounded-xl p-4 text-center shadow-lg">
                 <div className="text-2xl font-bold text-blue-400 mb-1">{profile.highScore.toLocaleString()}</div>
                 <div className="text-white/60 text-sm">High Score</div>
@@ -338,6 +343,11 @@ export default function ProfilePage() {
               <div className="bg-white/5 backdrop-blur-[20px] border border-white/10 rounded-xl p-4 text-center shadow-lg">
                 <div className="text-2xl font-bold text-orange-400 mb-1">{profile.mintCount}</div>
                 <div className="text-white/60 text-sm">NFTs Minted</div>
+              </div>
+
+              <div className="bg-white/5 backdrop-blur-[20px] border border-white/10 rounded-xl p-4 text-center shadow-lg">
+                <div className="text-2xl font-bold text-pink-400 mb-1">{profile.totalMemes}</div>
+                <div className="text-white/60 text-sm">Memes Generated</div>
               </div>
             </div>
 
