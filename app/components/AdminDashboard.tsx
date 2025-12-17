@@ -352,7 +352,23 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
                 <div className="bg-slate-700/50 p-4 rounded-lg mb-4">
                   <span className="text-gray-400 text-sm">💰 ETH Balance:</span>
                   <span className="text-white text-lg font-semibold block">
-                    {treasuryETHBalance ? `${parseFloat(treasuryETHBalance.formatted || '0').toFixed(5)} ETH` : 'Loading...'}
+                    {
+                      (() => {
+                        const t: any = treasuryETHBalance;
+                        if (!t) return 'Loading...';
+                        // Wagmi may return an object with `formatted` or a bigint/value
+                        if (typeof t === 'object' && t?.formatted) {
+                          const n = parseFloat(t.formatted || '0');
+                          return `${isFinite(n) ? n.toFixed(5) : '0.00000'} ETH`;
+                        }
+                        try {
+                          const asNum = Number(t) / 1e18;
+                          return `${isFinite(asNum) ? asNum.toFixed(5) : '0.00000'} ETH`;
+                        } catch (e) {
+                          return '0.00000 ETH';
+                        }
+                      })()
+                    }
                   </span>
                 </div>
 
