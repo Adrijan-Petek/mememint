@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAdminContract } from '../hooks/useAdminContract';
+import dynamic from 'next/dynamic';
+
+const TreasuryTokenBalance = dynamic(() => import('./TreasuryTokenBalance'), { ssr: false });
 
 import { CONTRACT_ADDRESSES } from "../contracts/addresses";
 
@@ -349,7 +352,7 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
                 <div className="bg-slate-700/50 p-4 rounded-lg mb-4">
                   <span className="text-gray-400 text-sm">💰 ETH Balance:</span>
                   <span className="text-white text-lg font-semibold block">
-                    {treasuryETHBalance ? `${Number(treasuryETHBalance) / 1e18} ETH` : 'Loading...'}
+                    {treasuryETHBalance ? `${parseFloat(treasuryETHBalance.formatted || '0').toFixed(5)} ETH` : 'Loading...'}
                   </span>
                 </div>
 
@@ -358,13 +361,12 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
                   <div className="space-y-2">
                     <h4 className="text-white font-semibold">Token Balances:</h4>
                     {supportedTokens.map((tokenAddress, index) => {
-                      const tokenBalance = getTokenBalance(tokenAddress);
                       return (
                         <div key={tokenAddress} className="bg-slate-700/30 p-3 rounded-lg flex justify-between items-center">
                           <span className="text-white font-mono text-sm">{tokenAddress.slice(0, 6)}...{tokenAddress.slice(-4)}</span>
-                          <span className="text-blue-400 font-semibold">
-                            {tokenBalance.data ? `${Number(tokenBalance.data)}` : 'Loading...'}
-                          </span>
+                          <div className="text-blue-400 font-semibold">
+                            <TreasuryTokenBalance tokenAddress={tokenAddress} />
+                          </div>
                         </div>
                       );
                     })}
