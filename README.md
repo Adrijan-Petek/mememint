@@ -1,263 +1,330 @@
-# 🎨 Mememint - Farcaster Gaming Ecosystem
+# 🎨 Mememint
 
-🚀 **LIVE ON BASE MAINNET** 🚀
+> **A Revolutionary Meme-to-Earn Gaming Ecosystem on Farcaster**
 
-**Mememint is ready!** A revolutionary meme-to-earn gaming ecosystem on Farcaster featuring NFT minting, leaderboard competitions, and an upcoming in-game token economy. Create memes, compete for rewards, collect NFTs, and build your profile in the ultimate meme gaming experience.
+[![Base Mainnet](https://img.shields.io/badge/Network-Base%20Mainnet-0052FF?style=flat-square&logo=ethereum)](https://basescan.org)
+[![Next.js](https://img.shields.io/badge/Next.js-16.0.10-000000?style=flat-square&logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
+[![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636?style=flat-square&logo=solidity)](https://soliditylang.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 
-## 🌐 Network Status
+---
 
-**Production Network:** Base Mainnet (Chain ID: 8453)  
-**Contract Address:** `0x74272c4ed63662df64457BCac4e259C338Ef85C0`  
-**Leaderboard:** `0xF4C22c98E07804Fd5602893f6125ce94055bB491`  
-**Database:** Nile Serverless PostgreSQL  
-**Status:** ✅ Verified on [BaseScan](https://basescan.org/address/0x74272c4ed63662df64457BCac4e259C338Ef85C0)
+## 🌟 Overview
 
-## ✨ Core Features
+Mememint is a cutting-edge meme-to-earn gaming platform built on Farcaster, combining creative meme generation with blockchain-powered NFT minting and competitive leaderboards. Create, collect, and compete in the ultimate meme gaming experience.
 
-### 🎮 **Meme-to-Earn Gaming**
-- **Generate & Earn**: Create memes and earn points for leaderboard ranking
-- **NFT Minting**: Turn your best memes into collectible NFTs on Base Mainnet
-- **Reward System**: Points for generation, gameplay, token purchases, and holding
-- **Profile Collection**: Build your gaming profile with achievements and rewards
+### ✨ Key Features
 
-### 🎨 **Advanced Meme Generation**
-- **100+ Templates**: Access all Imgflip meme templates including images
-- **Real-time Preview**: See your meme as you type with instant updates
-- **Text Customization**: Multiple text fields with preset transformations
-- **Font Selection**: Impact, Anton, Arial, Comic Sans, and Times fonts
-- **Background Options**: Transparent, White, Black, Sunset, Neon, and Violet presets
-- **Export Formats**: PNG, JPG, and GIF support
+- **🎨 Advanced Meme Generation**: 100+ templates with real-time preview
+- **🏆 Competitive Leaderboards**: Real-time rankings with points system
+- **🖼️ NFT Drops & Minting**: Exclusive NFT collections on Base Mainnet
+- **👛 Seamless Wallet Integration**: Coinbase OnchainKit for effortless transactions
+- **📊 Analytics Dashboard**: Track performance and achievements
+- **🎭 Farcaster Integration**: Native social gaming experience
 
-### 🏆 **Competitive Leaderboard**
-- **Real-time Rankings**: Top 100 generators with live updates
-- **Scoring System**: Points for different actions (generate: 150pts, game: 200pts, buy: 50pts, hold: 1000pts)
-- **User Profiles**: Farcaster integration with PFP and username display
-- **Mint Tracking**: Personal statistics and achievement progress
+---
 
-### 👛 **Seamless Wallet Integration**
-- **Coinbase OnchainKit**: Effortless wallet connection on Base Mainnet
-- **NFT Minting**: Pay 0.000017 ETH (~$0.05) to mint memes as NFTs
-- **Low Gas Fees**: Thanks to Base L2 efficiency
-- **Network Switching**: Automatic Base network detection and switching
+## 🚀 Live Deployment
 
-### 🎭 **Farcaster Hub Integration**
-- **Official API**: Direct integration with Farcaster Hub for user profiles
-- **Real Profiles**: Display actual Farcaster usernames and profile pictures
-- **Social Gaming**: Share achievements and memes on Farcaster
-- **Miniapp Optimized**: Perfectly adapted for Farcaster miniapp environment
+| Component | Network | Address | Status |
+|-----------|---------|---------|--------|
+| **Main Contract** | Base Mainnet | [`0x74272c4ed63662df64457BCac4e259C338Ef85C0`](https://basescan.org/address/0x74272c4ed63662df64457BCac4e259C338Ef85C0) | ✅ Verified |
+| **Leaderboard Contract** | Base Mainnet | [`0xF4C22c98E07804Fd5602893f6125ce94055bB491`](https://basescan.org/address/0xF4C22c98E07804Fd5602893f6125ce94055bB491) | ✅ Verified |
+| **NFT Drops Contract** | Base Mainnet | [`0xB864e9BD48eCfAB4e320aCd448EBa3E10F5690d6`](https://basescan.org/address/0xB864e9BD48eCfAB4e320aCd448EBa3E10F5690d6) | ✅ Verified |
+| **Treasury Contract** | Base Mainnet | [`0x4458bFdd688Df499Bc01e4E5890d0e9aA8aFa857`](https://basescan.org/address/0x4458bFdd688Df499Bc01e4E5890d0e9aA8aFa857) | ✅ Verified |
+| **Frontend** | Vercel | [mememint-one.vercel.app](https://mememint-one.vercel.app) | ✅ Live |
+| **Database** | Nile PostgreSQL | Serverless | ✅ Active |
 
-## 🚀 Upcoming Features
+---
 
-### 🪙 **In-Game Token Economy** *(Coming Soon)*
-- **MEME Token**: Native utility token for the Mememint ecosystem
-- **Token Rewards**: Earn tokens through gameplay and achievements
-- **NFT Staking**: Stake NFTs to earn additional token rewards
-- **Marketplace**: Trade memes and collectibles within the ecosystem
+## 🏗️ Architecture
 
-### 👤 **Enhanced User Profiles**
-- **Reward Collection**: Track and claim earned tokens and rewards
-- **Achievement System**: Unlock badges and special status
-- **NFT Gallery**: Showcase your minted meme collection
-- **Social Features**: Follow friends and view their achievements
+### Core Components
 
-### 🎯 **Advanced Gaming Features**
-- **Daily Challenges**: Complete quests for bonus rewards
-- **Tournament Mode**: Special events with increased rewards
-- **Guild System**: Team up with other memers for group challenges
-- **Seasonal Events**: Limited-time events with exclusive rewards
+```
+├── 🎨 Meme Generation Engine
+│   ├── 100+ Professional Templates
+│   ├── Real-time Text Rendering
+│   ├── Multi-format Export (PNG/JPG/GIF)
+│   └── Mobile-Optimized Interface
+│
+├── 🏆 Leaderboard System
+│   ├── Real-time Rankings (Top 100)
+│   ├── Points-based Scoring
+│   ├── Achievement Tracking
+│   └── Social Integration
+│
+├── 🖼️ NFT Ecosystem
+│   ├── ERC-1155 Drop Collections
+│   ├── Dynamic Pricing System
+│   ├── Treasury Management
+│   └── Cross-platform Minting
+│
+└── 👛 Wallet Integration
+    ├── Coinbase OnchainKit
+    ├── Base Mainnet Optimized
+    ├── Gas-efficient Transactions
+    └── Multi-device Support
+```
 
-## 🛠️ Tech Stack
+### Tech Stack
 
-- **Frontend**: Next.js 16, React 19, TypeScript
-- **Database**: Nile Serverless PostgreSQL (@niledatabase/server)
-- **Blockchain**: Base Mainnet (Ethereum L2)
-- **Smart Contracts**: Solidity, Hardhat, OpenZeppelin UUPS
-- **Wallet**: Coinbase OnchainKit, Wagmi, Viem
-- **APIs**: Farcaster Hub API, Imgflip API
-- **Platform**: Farcaster Miniapp SDK
-- **Build**: Turbopack for fast development
-- **Styling**: Tailwind CSS with custom animations
+| Category | Technology | Version |
+|----------|------------|---------|
+| **Frontend** | Next.js, React | 16.0.10, 19.0.0 |
+| **Language** | TypeScript | 5.0+ |
+| **Styling** | Tailwind CSS | Latest |
+| **Blockchain** | Solidity, Hardhat | 0.8.24, 2.22.3 |
+| **Libraries** | Wagmi, Viem | Latest |
+| **Database** | Nile PostgreSQL | Serverless |
+| **Platform** | Farcaster Miniapp | SDK v1 |
+| **Deployment** | Vercel | Latest |
 
-## 🚀 Quick Start
+---
 
-### 1. Install Dependencies
+## 🎮 How to Play
+
+### 1. **Create & Generate**
+- Access 100+ professional meme templates
+- Customize text with multiple fonts and styles
+- Preview in real-time with instant updates
+- Export in multiple formats
+
+### 2. **Earn & Compete**
+- Score points for each creation (150 pts)
+- Climb the global leaderboard
+- Unlock achievements and badges
+- Track your progress with analytics
+
+### 3. **Mint & Collect**
+- Browse exclusive NFT drops
+- Mint unique digital art pieces
+- Build your collection portfolio
+- Share achievements on Farcaster
+
+### 4. **Social Gaming**
+- Connect with Farcaster community
+- Share memes and NFTs
+- Compete in tournaments
+- Join the meme revolution
+
+---
+
+## 📊 Scoring System
+
+| Action | Points | Frequency |
+|--------|--------|-----------|
+| Generate Meme | 150 | Per creation |
+| Mint NFT | 500 | Per NFT minted |
+| Daily Login | 25 | Once per day |
+| Special Events | 200-1000 | Event-based |
+| Achievements | 100-500 | One-time unlocks |
+
+---
+
+## 🛠️ Quick Start
+
+### Prerequisites
+- Node.js 18+
+- npm or yarn
+- Git
+
+### Installation
+
 ```bash
+# Clone the repository
+git clone https://github.com/Adrijan-Petek/mememint.git
+cd mememint
+
+# Install dependencies
 npm install
 ```
 
-### 2. Set Environment Variables
+### Environment Setup
+
 Create `.env.local`:
+
 ```env
-# Nile Database Configuration
+# Database Configuration
 NILEDB_API_URL="https://eu-central-1.api.thenile.dev/v2/databases/YOUR_DB_ID"
 NILEDB_POSTGRES_URL="postgres://eu-central-1.db.thenile.dev/nile_menemint"
 DATABASE_URL="postgres://USER:PASS@eu-central-1.db.thenile.dev/nile_menemint"
 
-# Contract Configuration
+# Contract Addresses
 NEXT_PUBLIC_CONTRACT_ADDRESS=0x74272c4ed63662df64457BCac4e259C338Ef85C0
+NEXT_PUBLIC_LEADERBOARD_ADDRESS=0xF4C22c98E07804Fd5602893f6125ce94055bB491
+NEXT_PUBLIC_NFT_ADDRESS=0xB864e9BD48eCfAB4e320aCd448EBa3E10F5690d6
+NEXT_PUBLIC_TREASURY_ADDRESS=0x4458bFdd688Df499Bc01e4E5890d0e9aA8aFa857
 ```
 
-### 3. Setup Database
+### Database Setup
+
 ```bash
-# Initialize Nile database tables
-node setup-database.cjs
-```
-
-### 4. Run Development Server
-```bash
-npm run dev
-```
-
-### 5. Deploy Smart Contract (Optional)
-```bash
-# Start local Hardhat network
-npx hardhat node
-
-# Deploy contract in another terminal
-npm run deploy
-```
-
-## 🎯 How to Play
-
-1. **Connect Wallet**: Link your wallet to start earning rewards
-2. **Generate Memes**: Create hilarious memes using 100+ templates
-3. **Earn Points**: Get points for each generation and special actions
-4. **Climb Leaderboard**: Compete with other players for top rankings
-5. **Mint NFTs**: Turn your best creations into collectible NFTs
-6. **Build Profile**: Collect rewards and showcase achievements
-7. **Share & Socialize**: Post memes on Farcaster and connect with friends
-
-## 📊 Scoring System
-
-| Action | Points | Description |
-|--------|--------|-------------|
-| Generate Meme | 150 | Create a new meme |
-| Play Game | 200 | Participate in mini-games |
-| Buy Token | 50 | Purchase ecosystem tokens |
-| Hold Token | 1000 | Long-term token holding bonus |
-| Mint NFT | 500 | Mint a meme as NFT |
-| Daily Login | 25 | Daily active user bonus |
-
-## 📁 Project Structure
-
-```
-├── app/
-│   ├── api/
-│   │   ├── leaderboard/     # Leaderboard and scoring endpoints
-│   │   ├── profiles/        # Farcaster profile integration
-│   │   ├── memes/          # Template fetching
-│   │   └── generate/       # Meme generation
-│   ├── components/
-│   │   ├── MemeGenerator.tsx   # Main creation interface
-│   │   ├── WalletButton.tsx    # Wallet connection
-│   │   ├── Leaderboard.tsx     # Rankings display
-│   │   └── ...                 # Other UI components
-│   ├── hooks/
-│   │   ├── useScoring.ts       # Game scoring logic
-│   │   ├── useLeaderboard.ts   # Leaderboard management
-│   │   └── useMinting.ts       # NFT minting logic
-│   └── leaderboard/            # Leaderboard page
-├── contracts/
-│   ├── MemeMint.sol           # Main NFT contract
-│   └── MemeMintLeaderboard.sol # Leaderboard contract
-├── utils/
-│   └── database/              # Nile database utilities
-├── scripts/                   # Deployment scripts
-└── public/                    # Static assets
-```
-
-## 🔧 Development
-
-### Available Scripts
-```bash
-npm run dev      # Start development server with Turbopack
-npm run build    # Build for production
-npm run lint     # Run ESLint for code quality
-npm run deploy   # Deploy smart contract to local network
-```
-
-### Database Management
-```bash
-# Setup database tables
+# Initialize database tables
 node setup-database.cjs
 
 # Test database connection
 node test-db.cjs
-
-# Test leaderboard functionality
-node test-leaderboard.cjs
 ```
 
-### API Endpoints
+### Development
 
-#### Leaderboard System
-- `GET /api/leaderboard` - Get top 100 rankings
-- `GET /api/leaderboard/stats` - Global statistics
-- `POST /api/leaderboard/add-score` - Add user points
-- `GET /api/leaderboard/user-rank` - Get user ranking
-- `GET /api/leaderboard/user-points` - Get user total points
+```bash
+# Start development server
+npm run dev
 
-#### Profile System
-- `GET /api/profiles?address=0x...` - Get single user profile
-- `POST /api/profiles` - Batch fetch multiple profiles
+# Build for production
+npm run build
 
-## 🏗️ Smart Contracts
-
-### MemeMint.sol (Base Mainnet)
-- **Network**: Base Mainnet (Chain ID: 8453)
-- **Upgradeable**: OpenZeppelin's UUPS proxy pattern
-- **Minting Fee**: 0.000017 ETH (~$0.05)
-- **Owner Controls**: Withdrawal and emergency pause functionality
-- **Security**: Comprehensive access controls and input validation
-- **Verified**: ✅ [View on BaseScan](https://basescan.org/address/0x74272c4ed63662df64457BCac4e259C338Ef85C0)
-
-### MemeMintLeaderboard.sol (Base Mainnet)
-- **Network**: Base Mainnet (Chain ID: 8453)
-- **Ranking System**: Tracks top 100 minters with automatic updates
-- **Real-time Stats**: Live leaderboard with generation counts
-- **Gas Optimized**: Efficient on-chain data structures
-- **Verified**: ✅ [View on BaseScan](https://basescan.org/address/0xF4C22c98E07804Fd5602893f6125ce94055bB491)
-
-## 🎯 Why Base Mainnet?
-
-- ⚡ **Lightning Fast**: 1-2 second transaction confirmations
-- 💰 **Cost Effective**: Gas fees ~$0.01-0.05 per transaction
-- 🔐 **Secure**: Full Ethereum L2 security guarantees
-- 🌍 **Production Ready**: Real ETH value and NFT ownership
-- 🎮 **Gaming Optimized**: Perfect for meme-to-earn mechanics
-
-## 🤝 Contributing
-
-We welcome contributions to the Mememint ecosystem!
-
-1. **Fork** the repository on GitHub
-2. **Clone** your fork locally
-3. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
-4. **Make** your changes with proper testing
-5. **Commit** with clear messages (`git commit -m "Add amazing feature"`)
-6. **Push** to your branch (`git push origin feature/amazing-feature`)
-7. **Open** a Pull Request with detailed description
-
-### Development Guidelines
-- Follow TypeScript best practices
-- Maintain mobile-first responsive design
-- Test on both mobile and desktop
-- Ensure accessibility compliance
-- Keep commit messages descriptive
-
-## 📄 License
-
-**MIT License** - Free to use for your own meme-generating adventures! 🎭
+# Run tests
+npm test
+```
 
 ---
 
+## 📁 Project Structure
+
+```
+mememint/
+├── app/                          # Next.js App Router
+│   ├── api/                      # API Routes
+│   │   ├── db/                   # Database endpoints
+│   │   ├── leaderboard/          # Leaderboard API
+│   │   ├── mints/               # NFT minting API
+│   │   └── profiles/             # User profiles
+│   ├── components/               # React Components
+│   │   ├── AdminDashboard.tsx    # Admin panel
+│   │   ├── MemeGenerator.tsx     # Main creation tool
+│   │   ├── WalletButton.tsx      # Wallet connection
+│   │   └── NFT components        # Minting interface
+│   ├── mint/                     # NFT marketplace page
+│   ├── leaderboard/              # Rankings page
+│   ├── token/                    # Token trading page
+│   └── profile/                  # User profile page
+├── contracts/                    # Solidity Contracts
+│   ├── MememintERC1155.sol       # NFT drops contract
+│   ├── MemeMint.sol             # Main minting contract
+│   └── Treasury.sol              # Treasury management
+├── scripts/                      # Deployment & Utilities
+│   ├── deploy-erc1155.cjs        # NFT contract deployment
+│   ├── setup-database.cjs        # Database initialization
+│   └── verification scripts      # Contract verification
+├── test/                         # Test Suites
+│   ├── MememintERC1155.test.cjs  # NFT contract tests
+│   └── MemeMint.test.js          # Main contract tests
+└── utils/                        # Utilities
+    ├── database/                 # Nile database helpers
+    └── constants/                # App constants
+```
+
+---
+
+## 🔧 Smart Contracts
+
+### MememintERC1155.sol
+**ERC-1155 NFT Drops Contract**
+- **Features**: Drop creation, payable minting, treasury forwarding
+- **Security**: ReentrancyGuard, Pausable, AccessControl
+- **Gas Optimized**: Efficient batch operations
+- **Upgradeable**: UUPS proxy pattern
+
+### MemeMint.sol
+**Main Gaming Contract**
+- **Features**: NFT minting, leaderboard tracking
+- **Security**: Owner controls, emergency pause
+- **Economics**: Dynamic pricing, treasury management
+
+### Treasury.sol
+**Fund Management Contract**
+- **Features**: Multi-token support, secure withdrawals
+- **Security**: Role-based access control
+- **Transparency**: Event logging for all transactions
+
+---
+
+## 🎯 Development Guidelines
+
+### Code Quality
+- **TypeScript**: Strict type checking enabled
+- **ESLint**: Automated code linting
+- **Prettier**: Consistent code formatting
+- **Testing**: Comprehensive test coverage
+
+### Security
+- **Audit Ready**: OpenZeppelin battle-tested contracts
+- **Input Validation**: Comprehensive parameter checking
+- **Access Control**: Role-based permissions
+- **Emergency Controls**: Circuit breakers and pause functionality
+
+### Performance
+- **Optimized Builds**: Turbopack for fast development
+- **Lazy Loading**: Component-level code splitting
+- **Caching**: Intelligent asset caching
+- **Mobile First**: Responsive design optimization
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from the community!
+
+### How to Contribute
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
+
+### Development Workflow
+```bash
+# Create feature branch
+git checkout -b feature/your-feature-name
+
+# Make changes and test
+npm run dev
+npm run build
+
+# Commit changes
+git add .
+git commit -m "feat: add your feature description"
+
+# Push and create PR
+git push origin feature/your-feature-name
+```
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🌟 Acknowledgments
+
+- **Farcaster** for the revolutionary social platform
+- **Base** for the exceptional L2 infrastructure
+- **Coinbase** for OnchainKit and wallet infrastructure
+- **OpenZeppelin** for battle-tested smart contract libraries
+- **Nile** for serverless PostgreSQL infrastructure
+
+---
+
+## 📞 Contact & Support
+
+- **GitHub Issues**: [Report bugs & request features](https://github.com/Adrijan-Petek/mememint/issues)
+- **Discussions**: [Community discussions](https://github.com/Adrijan-Petek/mememint/discussions)
+- **Farcaster**: Follow [@mememint](https://warpcast.com/mememint) for updates
+
+---
+
+<div align="center">
+
 **Built with ❤️ for the Farcaster gaming community**
 
-*Create memes, earn rewards, mint NFTs, and dominate the leaderboard!*
+*Create. Compete. Collect. Dominate.*
 
-## 🚀 Roadmap
+[🚀 Launch App](https://mememint-one.vercel.app) • [📖 Documentation](https://github.com/Adrijan-Petek/mememint/wiki) • [🐛 Report Issue](https://github.com/Adrijan-Petek/mememint/issues)
 
-- **Phase 1** ✅: Meme generation, NFT minting, leaderboard
-- **Phase 2** 🔄: In-game token economy, enhanced profiles
-- **Phase 3** 📅: Tournament system, guild features, marketplace
-- **Phase 4** 🎯: Cross-platform expansion, advanced gaming mechanics
+</div>
