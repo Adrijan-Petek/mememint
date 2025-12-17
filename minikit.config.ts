@@ -37,6 +37,7 @@ export const minikitConfig = {
     tags: ["social", "generator", "meme"],
     imageUrl: "https://mememint-one.vercel.app/logo.png",
     tagline: "Position text anywhere",
+    primaryCategory: "social",
     heroImageUrl: "https://mememint-one.vercel.app/hero.png",
     ogTitle: "Mememint - Generate Epic Memes",
     ogDescription: "Position text anywhere on images. Easy and fun!",

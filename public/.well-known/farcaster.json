@@ -1,20 +1,34 @@
 {
   "accountAssociation": {
-    "header": "eyJmaWQiOjM2MjEsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHgyY2Q4NWEwOTMyNjFmNTkyNzA4MDRBNkVBNjk3Q2VBNENlQkVjYWZFIn0",
+    "header": "eyJmaWQiOjEwMDEyMDYsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHhCMkRCZTdkQUI2ZEUzMGRiYzYyNjc0MzA4RUQ2MEYyMTVjNWMxRkNCIn0",
     "payload": "eyJkb21haW4iOiJtZW1lbWludC1vbmUudmVyY2VsLmFwcCJ9",
-    "signature": "D7urCIelYBtFc12UkEw/VOE1rkGKMdmDqAP/6s7sLWNfjhyug8pQCTM68XVJ8Gal6eBZxvtFE4RpVwqDtnLrzhs="
+    "signature": "MHhjZDU3NDk3OWEzNDE1YTFiMWFlY2ZhMmZhOGYwYjIxYjQzNTAyYjIwYjdmZjEwYzI5MWJlYzUzZTVkMjJiOWNjNDY3Zjk2ZGQ3OWRhNjU2ZTIzZjlhY2Y4N2Y1ZGRmOWQwMDdjMzkyOWEzYzU2MjAyNjMwYjBmNWYzMzI5MWJhOTFi"
   },
   "miniapp": {
     "version": "1",
-    "name": "MemeMint",
+    "name": "Mememint",
     "iconUrl": "https://mememint-one.vercel.app/icon.png",
     "homeUrl": "https://mememint-one.vercel.app",
-    "imageUrl": "https://mememint-one.vercel.app/hero.png",
-    "buttonTitle": "Open MemeMint",
+    "imageUrl": "https://mememint-one.vercel.app/logo.png",
+    "buttonTitle": "Generate Meme",
     "splashImageUrl": "https://mememint-one.vercel.app/splash.png",
-    "splashBackgroundColor": "#000000",
+    "splashBackgroundColor": "#0f172a",
+    "webhookUrl": "https://mememint-one.vercel.app/api/webhook",
+    "subtitle": "A beautiful generator",
+    "description": "A beautiful meme generator for Farcaster",
+    "screenshotUrls": [
+      "https://mememint-one.vercel.app/screenshot.jpeg",
+      "https://mememint-one.vercel.app/hero.png",
+      "https://mememint-one.vercel.app/splash.png"
+    ],
     "primaryCategory": "social",
-    "description": "Create and mint memes on Farcaster",
+    "tags": ["social", "generator", "meme"],
+    "heroImageUrl": "https://mememint-one.vercel.app/hero.png",
+    "tagline": "Position text anywhere",
+    "ogTitle": "Mememint - Generate Epic Memes",
+    "ogDescription": "Position text anywhere on images. Easy and fun!",
+    "ogImageUrl": "https://mememint-one.vercel.app/hero.png",
+    "castShareUrl": "https://mememint-one.vercel.app",
     "requiredChains": ["eip155:8453"],
     "requiredCapabilities": ["wallet.getEthereumProvider", "actions.composeCast"]
   }
