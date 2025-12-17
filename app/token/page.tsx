@@ -56,6 +56,7 @@ export default function TokenPage() {
 
       <main className="p-4 max-w-4xl mx-auto pt-24 md:p-2 md:pt-20 sm:p-1 sm:pt-16">
         <div className="text-center mb-8">
+          <img src="https://mememint-one.vercel.app/icon.png" alt="Mememint token" className="mx-auto mb-3 w-16 h-16 rounded" />
           <h1 className="text-4xl font-extrabold bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-3 -tracking-wider drop-shadow-[0_0_30px_rgba(96,165,250,0.3)] md:text-3xl sm:text-2xl">💎 Mememint Token</h1>
           <p className="text-lg text-white/80 font-normal md:text-base sm:text-sm">Swap MEMEMINT token.</p>
         </div>
