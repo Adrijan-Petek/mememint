@@ -1,5 +1,5 @@
 // Auto-generated contract ABI
-// Generated on: 2025-12-17T22:34:07.348Z
+// Generated on: 2025-12-18T00:39:48.023Z
 // Network: base
 // Contract Address: 0xB864e9BD48eCfAB4e320aCd448EBa3E10F5690d6
 
@@ -637,6 +637,24 @@ export const NFT_ABI = [
   {
     "inputs": [],
     "name": "unpause",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "newPriceWei",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateDropPrice",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

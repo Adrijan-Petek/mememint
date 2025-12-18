@@ -1,5 +1,5 @@
 // Auto-generated contract ABI
-// Generated on: 2025-12-17T22:34:07.348Z
+// Generated on: 2025-12-18T00:39:48.023Z
 // Network: base
 // Contract Address: 
 

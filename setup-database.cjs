@@ -78,16 +78,10 @@ async function setupDatabase() {
       tx_hash TEXT,
       created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
     )`);
-    
-    // Add tx_hash column if it doesn't exist (for existing tables)
-    try {
-      await nile.query(`ALTER TABLE drops ADD COLUMN IF NOT EXISTS tx_hash TEXT`);
-      console.log('✅ Added tx_hash column to drops table');
-    } catch (error) {
-      console.log('Note: tx_hash column may already exist or ALTER TABLE not supported');
-    }
-    
-    console.log('✅ Created drops table');
+
+    // Ensure tx_hash column exists (idempotent)
+    await nile.query(`ALTER TABLE drops ADD COLUMN IF NOT EXISTS tx_hash TEXT`);
+    console.log('✅ Ensured drops table and tx_hash column');
 
     // Create nft_mints table
     console.log('Creating nft_mints table...');
@@ -122,3 +116,9 @@ async function setupDatabase() {
     process.exit(1);
   }
 }
+
+// Execute the setup when run as a script
+setupDatabase().catch((err) => {
+  console.error('Unhandled error in setupDatabase:', err);
+  process.exit(1);
+});

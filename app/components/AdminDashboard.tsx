@@ -293,18 +293,7 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
     }
 
     try {
-      // Update contract price
-      await writeContractAsync({
-        address: CONTRACT_ADDRESSES.nft,
-        abi: NFT_ABI,
-        functionName: 'updateDropPrice',
-        args: [
-          BigInt(drop.drop_id),
-          parseEther(editPrice),
-        ],
-      });
-
-      // Update DB
+      // Update DB price only (server-side). On-chain price updates require owner wallet.
       const response = await fetch('/api/db/drops', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -316,16 +305,18 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
 
       const data = await response.json();
       if (data.success) {
-        alert('Drop price updated successfully!');
+        alert('Drop price updated in admin panel successfully! (DB updated)');
         setEditingDrop(null);
         setEditPrice('');
         loadDrops(); // Refresh the drops list
       } else {
-        alert(`Failed to update drop price: ${data.error}`);
+        console.error('Failed to update drop price (DB):', data);
+        alert(`Failed to update drop price: ${data.error || JSON.stringify(data)}`);
       }
     } catch (error) {
       console.error('Error updating drop price:', error);
-      alert('Failed to update drop price');
+      const msg = error instanceof Error ? error.message : String(error);
+      alert(`Failed to update drop price: ${msg}`);
     }
   };
 

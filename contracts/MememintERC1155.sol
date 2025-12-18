@@ -55,6 +55,12 @@ contract MememintERC1155 is ERC1155, Ownable, ReentrancyGuard, Pausable {
         emit DropCreated(id, priceWei, supply, uri_);
     }
 
+    function updateDropPrice(uint256 id, uint256 newPriceWei) external onlyOwner {
+        require(drops[id].exists, "drop does not exist");
+        drops[id].priceWei = newPriceWei;
+        emit DropCreated(id, newPriceWei, drops[id].supply, drops[id].uri); // Reuse event for price updates
+    }
+
     function uri(uint256 id) public view override returns (string memory) {
         require(drops[id].exists, "no drop");
         return drops[id].uri;

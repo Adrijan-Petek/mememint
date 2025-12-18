@@ -61,8 +61,8 @@ export default function Mint() {
       const hash = await writeContractAsync({
         address: CONTRACT_ADDRESSES.nft,
         abi: NFT_ABI,
-        functionName: 'buy',
-        args: [drop.drop_id, 1], // dropId, quantity
+        functionName: 'mint',
+        args: [BigInt(drop.drop_id), BigInt(1)], // dropId, quantity
         value: BigInt(drop.price_wei),
       });
 
@@ -181,7 +181,7 @@ export default function Mint() {
         </div>
       </header>
 
-      <main className="p-4 max-w-7xl mx-auto pt-24 md:p-2 md:pt-20 sm:p-1 sm:pt-16">
+      <main className="p-4 max-w-4xl mx-auto pt-24 md:p-2 md:pt-20 sm:p-1 sm:pt-16">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-extrabold bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-3 -tracking-wider drop-shadow-[0_0_30px_rgba(96,165,250,0.3)] md:text-3xl sm:text-2xl">
             Mint NFTs
