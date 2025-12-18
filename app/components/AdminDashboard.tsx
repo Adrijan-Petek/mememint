@@ -928,7 +928,16 @@ export default function AdminDashboard({ isVisible, onClose }: AdminDashboardPro
 
               {/* Saved Drops */}
               <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-600">
-                <h3 className="text-xl font-bold text-white mb-4">📋 Saved Drops ({savedDrops.length})</h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-white mb-4">📋 Saved Drops ({savedDrops.length})</h3>
+                  <button
+                    onClick={loadDrops}
+                    disabled={isLoadingDrops}
+                    className="px-3 py-1 bg-indigo-600 text-white rounded text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoadingDrops ? 'Refreshing...' : 'Refresh'}
+                  </button>
+                </div>
                 {isLoadingDrops ? (
                   <p className="text-gray-400">Loading drops...</p>
                 ) : savedDrops.length === 0 ? (

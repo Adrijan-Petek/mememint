@@ -6,10 +6,22 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { WalletButton } from "../components/WalletButton";
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useAccount, useWriteContract, useWaitForTransactionReceipt, useContractRead } from "wagmi";
 import { CONTRACT_ADDRESSES } from "../contracts/addresses";
 import { NFT_ABI } from "../contracts/NFTABI";
 import { parseEther, formatEther } from "viem";
+
+function formatPrice(priceWei: string) {
+  try {
+    const s = formatEther(BigInt(priceWei));
+    const n = parseFloat(s);
+    if (n === 0) return '0';
+    if (n >= 0.001) return n.toFixed(3);
+    return n.toFixed(6).replace(/\.0+$|(?<=\.[0-9]*?)0+$/,'').replace(/\.$/, '');
+  } catch (e) {
+    return '0';
+  }
+}
 
 interface Drop {
   drop_id: number;
@@ -35,6 +47,12 @@ export default function Mint() {
     fetchDrops();
   }, []);
 
+  // Poll drops periodically to keep minted counts up-to-date
+  useEffect(() => {
+    const id = setInterval(() => fetchDrops(), 10000);
+    return () => clearInterval(id);
+  }, []);
+
   const fetchDrops = async () => {
     try {
       const response = await fetch('/api/db/drops');
@@ -48,6 +66,8 @@ export default function Mint() {
       setLoading(false);
     }
   };
+
+  
 
   const handleMint = async (drop: Drop) => {
     if (!address) {
@@ -70,8 +90,8 @@ export default function Mint() {
       // For now, we'll just wait a bit and assume success
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Record the mint in DB
-      await fetch('/api/mints/record', {
+      // Record the mint in DB and get updated minted count
+      const resp = await fetch('/api/mints/record', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -82,6 +102,15 @@ export default function Mint() {
           txHash: hash,
         }),
       });
+
+      const respJson = await resp.json().catch(() => ({}));
+
+      // If server returned updated minted count, use it; otherwise increment optimistically
+      if (respJson && typeof respJson.updatedMinted === 'number') {
+        setDrops((prev) => prev.map(d => d.drop_id === drop.drop_id ? { ...d, minted: respJson.updatedMinted } : d));
+      } else {
+        setDrops((prev) => prev.map(d => d.drop_id === drop.drop_id ? { ...d, minted: Math.min(d.minted + 1, d.supply) } : d));
+      }
 
       // Share the mint
       await sdk.actions.composeCast({
@@ -99,6 +128,18 @@ export default function Mint() {
       alert('Failed to mint NFT');
     } finally {
       setMintingDropId(null);
+    }
+  };
+
+  const handleShareNFT = async (drop: Drop) => {
+    try {
+      await sdk.actions.composeCast({
+        text: `I just minted "${drop.name}" on Mememint! 🎨✨`,
+        embeds: [drop.uri || 'https://mememint-one.vercel.app/mint']
+      });
+    } catch (error) {
+      console.error('Failed to share NFT:', error);
+      alert('Failed to share NFT');
     }
   };
 
@@ -202,87 +243,89 @@ export default function Mint() {
             <p className="text-white/60">Check back later for new drops!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
             {drops.map((drop) => (
-              <div
+              <DropCard
                 key={drop.drop_id}
-                className="bg-gradient-to-br from-slate-900/80 to-slate-800/80 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:border-blue-500/30 transition-all duration-300 hover:shadow-[0_8px_32px_rgba(59,130,246,0.2)] hover:-translate-y-1"
-              >
-                <div className="aspect-square bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl mb-4 overflow-hidden">
-                  {drop.uri ? (
-                    <img
-                      src={drop.uri}
-                      alt={drop.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = '/placeholder-nft.png'; // Fallback image
-                      }}
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-white/30 text-4xl">
-                      🎨
-                    </div>
-                  )}
-                </div>
-
-                <h3 className="text-xl font-bold text-white mb-2">{drop.name}</h3>
-                <p className="text-white/60 text-sm mb-4 line-clamp-2">{drop.description}</p>
-
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-white/60">Price:</span>
-                    <span className="text-white font-semibold">{parseFloat(formatEther(BigInt(drop.price_wei))).toFixed(3)} ETH</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-white/60">Minted:</span>
-                    <span className="text-white">{drop.minted}/{drop.supply}</span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => handleMint(drop)}
-                  disabled={mintingDropId === drop.drop_id || drop.minted >= drop.supply || !address}
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 hover:shadow-[0_4px_16px_rgba(59,130,246,0.4)] hover:-translate-y-0.5"
-                >
-                  {mintingDropId === drop.drop_id ? (
-                    <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Minting...
-                    </div>
-                  ) : drop.minted >= drop.supply ? (
-                    'Sold Out'
-                  ) : !address ? (
-                    'Connect Wallet'
-                  ) : (
-                    'Mint NFT'
-                  )}
-                </button>
-              </div>
+                drop={drop}
+                handleMint={handleMint}
+                mintingDropId={mintingDropId}
+                handleShareNFT={handleShareNFT}
+              />
             ))}
           </div>
         )}
 
         {/* Footer */}
         <div className="mt-16 text-center">
-          <div className="flex justify-center gap-4 mb-6">
-            <button
-              onClick={handleShareApp}
-              className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-2 px-6 rounded-lg transition-all duration-300 hover:shadow-[0_4px_16px_rgba(34,197,94,0.4)] hover:-translate-y-0.5"
-            >
-              Share App
-            </button>
-            <button
-              onClick={handleAddMiniApp}
-              className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-semibold py-2 px-6 rounded-lg transition-all duration-300 hover:shadow-[0_4px_16px_rgba(147,51,234,0.4)] hover:-translate-y-0.5"
-            >
-              Add to Frame
-            </button>
-          </div>
-          <p className="text-white/40 text-sm">
-            Powered by Mememint • Built on Base
-          </p>
+          <p className="text-white/40 text-sm">Powered by Mememint • Built on Base</p>
         </div>
       </main>
+    </div>
+  );
+}
+
+function DropCard({ drop, handleMint, mintingDropId, handleShareNFT }: { drop: Drop; handleMint: (d: Drop) => void; mintingDropId: number | null; handleShareNFT: (d: Drop) => void }) {
+  const { address } = useAccount();
+  const [expanded, setExpanded] = useState(false);
+
+  const { data: owned } = useContractRead({
+    address: CONTRACT_ADDRESSES.nft,
+    abi: NFT_ABI,
+    functionName: 'balanceOf',
+    args: [address ?? '0x0000000000000000000000000000000000000000', BigInt(drop.drop_id)],
+  });
+
+  return (
+    <div className="bg-gradient-to-br from-slate-900/80 to-slate-800/80 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:border-blue-500/30 transition-all duration-300 hover:shadow-[0_8px_32px_rgba(59,130,246,0.2)] hover:-translate-y-1">
+      <div className="aspect-square bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl mb-4 overflow-hidden">
+        {drop.uri ? (
+          <img src={drop.uri} alt={drop.name} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = '/placeholder-nft.png'; }} />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-white/30 text-4xl">🎨</div>
+        )}
+      </div>
+
+      <h3 className="text-xl font-bold text-white mb-2">{drop.name}</h3>
+      <p className={`text-white/60 text-sm mb-2 ${expanded ? '' : 'line-clamp-2'}`}>{drop.description}</p>
+      {drop.description && drop.description.length > 120 && (
+        <button className="text-sm text-blue-400 hover:underline mb-4" onClick={() => setExpanded(v => !v)}>
+          {expanded ? 'Show less' : 'Read more'}
+        </button>
+      )}
+
+        <div className="space-y-2 mb-4">
+        <div className="flex justify-between text-sm">
+          <span className="text-white/60">Price:</span>
+          <span className="text-white font-semibold">{formatPrice(drop.price_wei)} ETH</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-white/60">Minted:</span>
+          <span className="text-white">{drop.minted}/{drop.supply}</span>
+        </div>
+        {owned !== undefined && (
+          <div className="flex justify-between text-sm">
+            <span className="text-white/60">You own:</span>
+            <span className="text-white">{Number(owned ?? 0)}</span>
+          </div>
+        )}
+      </div>
+
+      <button onClick={() => handleMint(drop)} disabled={mintingDropId === drop.drop_id || drop.minted >= drop.supply || !address} className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:from-gray-600 disabled:to-gray-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-50 hover:shadow-[0_4px_16px_rgba(59,130,246,0.4)] hover:-translate-y-0.5">
+        {mintingDropId === drop.drop_id ? (
+          <div className="flex items-center justify-center"><div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>Minting...</div>
+        ) : drop.minted >= drop.supply ? (
+          'Sold Out'
+        ) : !address ? (
+          'Connect Wallet'
+        ) : (
+          'Mint NFT'
+        )}
+      </button>
+
+      <button onClick={() => handleShareNFT(drop)} className="mt-3 w-full bg-white/6 text-white font-medium py-2 rounded-lg hover:bg-white/10 transition">
+        Share NFT
+      </button>
     </div>
   );
 }
