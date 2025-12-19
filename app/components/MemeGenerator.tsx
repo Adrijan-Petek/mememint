@@ -84,6 +84,7 @@ export default function MemeGenerator({ onShowAdminDashboard: _ }: MemeGenerator
 
   const { address } = useAccount();
   const lastSavedRef = useRef<string | null>(null);
+  const prevConfirmedRef = useRef(false);
 
   const { startMinting, resetMinting, isTransactionConfirmed } = useMinting();
 
@@ -101,7 +102,7 @@ export default function MemeGenerator({ onShowAdminDashboard: _ }: MemeGenerator
   }, [selectedTemplate]);
 
   useEffect(() => {
-    if (isTransactionConfirmed) {
+    if (isTransactionConfirmed && !prevConfirmedRef.current) {
       setShowShareDownload(true);
 
       // Attempt to save the generated meme once to the DB
@@ -126,6 +127,7 @@ export default function MemeGenerator({ onShowAdminDashboard: _ }: MemeGenerator
         }
       })();
     }
+    prevConfirmedRef.current = isTransactionConfirmed;
   }, [isTransactionConfirmed, permanentMemeUrl, generatedMeme, address, selectedTemplate, texts]);
 
   // Debounced preview tick prevents recomputing a new URL on every keystroke

@@ -12,22 +12,6 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: minikitConfig.frame.name,
     description: minikitConfig.frame.description,
-    other: {
-      "fc:miniapp": JSON.stringify({
-        version: "1",
-        imageUrl: minikitConfig.frame.heroImageUrl,
-        button: {
-          title: `🎨 Generate Memes`,
-          action: {
-            type: "launch_frame",
-            name: minikitConfig.frame.name,
-            url: minikitConfig.frame.homeUrl,
-            splashImageUrl: minikitConfig.frame.splashImageUrl,
-            splashBackgroundColor: minikitConfig.frame.splashBackgroundColor,
-          },
-        },
-      }),
-    },
   };
 }
 
