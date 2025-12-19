@@ -396,10 +396,19 @@ export default function MemeGenerator({ onShowAdminDashboard: _ }: MemeGenerator
       {/* Share/Download Popup */}
       {showShareDownload && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowShareDownload(false)}>
-          <div className="bg-gray-900/95 border border-blue-400/20 rounded-xl backdrop-blur-xl shadow-2xl max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+          <div className="relative bg-gray-900/95 border border-blue-400/20 rounded-xl backdrop-blur-xl shadow-2xl max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+            {/* Close Button */}
+            <button
+              type="button"
+              onClick={() => setShowShareDownload(false)}
+              className="absolute top-3 right-3 text-gray-400 hover:text-white text-xl leading-none transition-colors"
+              aria-label="Close"
+            >
+              ✕
+            </button>
             <div className="p-4 text-center">
               <h3 className="text-lg font-bold text-white mb-2">🎉 Meme Generated!</h3>
-              <p className="text-gray-300 mb-4">Your meme has been successfully minted as an NFT on Base!</p>
+              <p className="text-gray-300 mb-4">Your meme has been successfully generated. You can now share or download it.</p>
               <div className="flex gap-2">
                 <button
                   onClick={handleShare}
