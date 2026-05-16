@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800" viewBox="0 0 800 800">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="stroke" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#60a5fa"/>
+      <stop offset="50%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#f472b6"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" rx="48" fill="url(#bg)"/>
+  <rect x="56" y="56" width="688" height="688" rx="40" fill="none" stroke="url(#stroke)" stroke-width="10" opacity="0.9"/>
+  <g fill="#ffffff" opacity="0.8">
+    <path d="M276 502c-10 0-18-8-18-18V316c0-10 8-18 18-18h248c10 0 18 8 18 18v168c0 10-8 18-18 18H276zm18-36h212V334H294v132z"/>
+    <path d="M332 454l48-56 34 40 42-50 50 66H332z"/>
+    <circle cx="352" cy="372" r="20"/>
+  </g>
+  <text x="400" y="640" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="28" fill="#ffffff" opacity="0.65">
+    NFT Preview Unavailable
+  </text>
+</svg>
+

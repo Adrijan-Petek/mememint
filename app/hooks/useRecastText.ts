@@ -1,0 +1,140 @@
+import { useMemo } from 'react';
+
+const recastMessages = [
+  "Just minted a meme on MemeMint! 🎨✨",
+  "Created this masterpiece on MemeMint! 🚀🎨",
+  "My meme game is strong! Made on MemeMint 💪🎭",
+  "Fresh meme alert! Minted on MemeMint 🔥🖼️",
+  "Dropping some meme magic on MemeMint! ✨🎪",
+  "New meme unlocked on MemeMint! 🔓🎨",
+  "Meme szn is here! Created on MemeMint 🌟💎",
+  "Just cooked up this meme on MemeMint! 👨‍🍳🎨",
+  "Meme artistry at its finest on MemeMint! 🎭✨",
+  "Another banger from MemeMint! 💥🖼️",
+  "Meme vibes only! Made on MemeMint 🌊🎨",
+  "Crafted this beauty on MemeMint! 💎🎪",
+  "Meme energy activated on MemeMint! ⚡🎭",
+  "Just blessed the timeline with this MemeMint creation! 🙏✨",
+  "Meme mode: ON! Created on MemeMint 🎯🎨",
+  "Fresh off the MemeMint press! 🗞️🔥",
+  "Serving up hot memes on MemeMint! 🔥🍕",
+  "My meme just dropped on MemeMint! 💿🎨",
+  "MemeMint magic in action! ✨🪄",
+  "Built different on MemeMint! 💪🎭",
+  "Meme legend status unlocked on MemeMint! 🏆🎨",
+  "Creating culture on MemeMint! 🎪💫",
+  "Just memed it on MemeMint! ✅🎨",
+  "Meme alchemist at work on MemeMint! 🧪✨",
+  "Peak creativity on MemeMint! 🗻🎭",
+  "Meme chef cooking up heat on MemeMint! 👨‍🍳🔥",
+  "Straight fire from MemeMint! 🔥🎯",
+  "Meme king/queen moment on MemeMint! 👑✨",
+  "This meme hits different on MemeMint! 💯🎨",
+  "Unleashing creativity on MemeMint! 🦁🎭",
+  "Meme masterclass in session on MemeMint! 🎓🎨",
+  "Pure meme gold on MemeMint! 🥇💛",
+  "Meme wizard at work on MemeMint! 🧙‍♂️✨",
+  "Creating viral moments on MemeMint! 📈🔥",
+  "Meme architect building on MemeMint! 🏗️🎨",
+  "Dropping knowledge in meme form on MemeMint! 🧠💡",
+  "Meme symphony composed on MemeMint! 🎵🎭",
+  "Next level meme content on MemeMint! 📊🚀",
+  "Meme revolution starts here on MemeMint! ⚔️✨",
+  "Making meme history on MemeMint! 📚🎨",
+  "Meme excellence achieved on MemeMint! 🏅💎",
+  "Certified meme maker on MemeMint! 📜🎭",
+  "Meme dynasty building on MemeMint! 🏰✨",
+  "Pure artistry captured on MemeMint! 🖼️💫",
+  "Meme genius at play on MemeMint! 🎯🧠",
+  "Creating meme monuments on MemeMint! 🗿🎨",
+  "Meme craftsman at work on MemeMint! 🔨✨",
+  "Serving fresh memes daily on MemeMint! 🍱🔥",
+  "Meme empire expanding on MemeMint! 🌍👑",
+  "Cooking with gas on MemeMint! 🔥⛽",
+  "Meme scientist experimenting on MemeMint! 🔬✨",
+  "Unleashed this beast on MemeMint! 🦁💥",
+  "Meme pharaoh blessing you on MemeMint! 🐪👑",
+  "Digital art revolution on MemeMint! 💻🎨",
+  "Meme samurai strikes on MemeMint! ⚔️🎭",
+  "Creating legendary content on MemeMint! 📖✨",
+  "Meme astronaut exploring on MemeMint! 🚀🌙",
+  "Pure vibes manifested on MemeMint! ✨🌈",
+  "Meme engineer designing on MemeMint! ⚙️🎨",
+  "Breaking the internet with MemeMint! 💥🌐",
+  "Meme philosopher thinking on MemeMint! 🤔💭",
+  "Serving looks on MemeMint! 👀🔥",
+  "Meme warrior conquering on MemeMint! ⚔️💪",
+  "Creating digital masterpieces on MemeMint! 💎🖼️",
+  "Meme sorcerer casting spells on MemeMint! 🪄✨",
+  "Elevating the game on MemeMint! 📈🎯",
+  "Meme ninja striking on MemeMint! 🥷💨",
+  "Pure chaos energy on MemeMint! 🌪️😈",
+  "Meme doctor prescribing laughs on MemeMint! 💊😂",
+  "Creating instant classics on MemeMint! ⏰🏆",
+  "Meme pilot taking off on MemeMint! ✈️🚀",
+  "Dropping absolute gems on MemeMint! 💎💎",
+  "Meme explorer discovering on MemeMint! 🗺️🔍",
+  "Serving premium content on MemeMint! 👌✨",
+  "Meme gladiator fighting on MemeMint! 🗡️🛡️",
+  "Pure entertainment on MemeMint! 🎬🍿",
+  "Meme architect blueprinting on MemeMint! 📐🎨",
+  "Creating cultural moments on MemeMint! 🎭🌟",
+  "Meme oracle predicting on MemeMint! 🔮✨",
+  "Absolute madness on MemeMint! 🤪🔥",
+  "Meme guardian protecting vibes on MemeMint! 🛡️😊",
+  "Serving main character energy on MemeMint! 🌟💫",
+  "Meme DJ dropping beats on MemeMint! 🎧🔊",
+  "Creating Internet gold on MemeMint! 🥇🌐",
+  "Meme sensei teaching on MemeMint! 🥋📚",
+  "Dropping fire content on MemeMint! 🔥📱",
+  "Meme captain sailing on MemeMint! ⛵🌊",
+  "Pure entertainment gold on MemeMint! 🎪🥇",
+  "Meme titan rising on MemeMint! 🗿💪",
+  "Creating smile factories on MemeMint! 😊🏭",
+  "Meme prophet spreading joy on MemeMint! 🙏😄",
+  "Serving absolute chaos on MemeMint! 🌀😈",
+  "Meme ranger exploring on MemeMint! 🏹🌲",
+  "Digital creativity unleashed on MemeMint! 💻✨",
+  "Meme knight crusading on MemeMint! 🛡️⚔️",
+  "Creating viral sensations on MemeMint! 📈🌟",
+  "Meme champion reigning on MemeMint! 🏆👑",
+  "Serving quality content on MemeMint! ✅💎",
+  "Meme nomad wandering on MemeMint! 🏜️🚶",
+  "Pure genius captured on MemeMint! 🧠💡",
+  "Meme shaman channeling on MemeMint! 🔮🌿",
+  "Creating timeless art on MemeMint! ⏳🎨",
+  "Meme merchant trading on MemeMint! 💰🤝",
+  "Dropping culture bombs on MemeMint! 💣🎭",
+  "Meme scholar researching on MemeMint! 📚🔬",
+  "Serving fresh perspectives on MemeMint! 👁️✨",
+  "Meme emperor ruling on MemeMint! 👑🏛️",
+  "Creating laugh factories on MemeMint! 😂🏭",
+  "Meme hunter gathering on MemeMint! 🏹🎯",
+  "Pure excellence achieved on MemeMint! 💯🌟",
+  "Meme commander leading on MemeMint! 🎖️⚡",
+  "Dropping absolute fire on MemeMint! 🔥💥",
+  "Meme mystic divining on MemeMint! 🔮✨",
+  "Creating zeitgeist moments on MemeMint! ⏰🌍"
+];
+
+/**
+ * Custom hook that returns a random recast message
+ * Generates a new message each time the component re-renders or the hook is called
+ */
+export const useRecastText = () => {
+  const message = useMemo(() => {
+    const randomIndex = Math.floor(Math.random() * recastMessages.length);
+    return recastMessages[randomIndex];
+  }, []);
+
+  return message;
+};
+
+/**
+ * Function to get a random recast message without using React hooks
+ * Useful for non-component contexts
+ */
+export const getRandomRecastText = (): string => {
+  const randomIndex = Math.floor(Math.random() * recastMessages.length);
+  return recastMessages[randomIndex];
+};
