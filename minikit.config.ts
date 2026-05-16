@@ -24,25 +24,25 @@ export const minikitConfig = {
     subtitle: "A beautiful generator",
     description: "A beautiful meme generator for Farcaster",
     screenshotUrls: [
-      "https://mememint-one.vercel.app/screenshot.jpeg",
-      "https://mememint-one.vercel.app/hero.png",
-      "https://mememint-one.vercel.app/splash.png"
+      "https://mememint-chi.vercel.app/screenshot.jpeg",
+      "https://mememint-chi.vercel.app/hero.png",
+      "https://mememint-chi.vercel.app/splash.png"
     ],
-    iconUrl: "https://mememint-one.vercel.app/icon.png",
-    splashImageUrl: "/uploads/the-emerald-degenerate.png",
+    iconUrl: "https://mememint-chi.vercel.app/icon.png",
+    splashImageUrl: "https://mememint-chi.vercel.app/uploads/the-emerald-degenerate.png",
     splashBackgroundColor: "#0f172a",
-    homeUrl: "https://mememint-one.vercel.app",
+    homeUrl: "https://mememint-chi.vercel.app",
     aspectRatio: "square",
-    webhookUrl: "https://mememint-one.vercel.app/api/webhook",
+    webhookUrl: "https://mememint-chi.vercel.app/api/webhook",
     tags: ["social", "generator", "meme"],
-    imageUrl: "/uploads/the-emerald-degenerate.png",
+    imageUrl: "https://mememint-chi.vercel.app/uploads/the-emerald-degenerate.png",
     tagline: "Position text anywhere",
     primaryCategory: "social",
-    heroImageUrl: "/uploads/the-emerald-degenerate.png",
+    heroImageUrl: "https://mememint-chi.vercel.app/uploads/the-emerald-degenerate.png",
     ogTitle: "Mememint - Generate Epic Memes",
     ogDescription: "Position text anywhere on images. Easy and fun!",
-    ogImageUrl: "/uploads/the-emerald-degenerate.png",
-    castShareUrl: "https://mememint-one.vercel.app",
+    ogImageUrl: "https://mememint-chi.vercel.app/uploads/the-emerald-degenerate.png",
+    castShareUrl: "https://mememint-chi.vercel.app",
     noindex: false // ✅ ensures your app appears in Farcaster search
   }
 };
