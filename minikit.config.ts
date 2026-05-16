@@ -5,11 +5,11 @@
 export const minikitConfig = {
   accountAssociation: {
     header:
-      "eyJmaWQiOjEwMDEyMDYsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHhCMkRCZTdkQUI2ZEUzMGRiYzYyNjc0MzA4RUQ2MEYyMTVjNWMxRkNCIn0",
+      "eyJmaWQiOjEwMDEyMDYsInR5cGUiOiJhdXRoIiwia2V5IjoiMHhiMWVDNUU3N0VkYzY0ZWE4QzdkMDczNDQ1NzA3ZDBFMzFiNTg3NjhmIn0",
     payload:
-      "eyJkb21haW4iOiJtZW1lbWludC1vbmUudmVyY2VsLmFwcCJ9",
+      "eyJkb21haW4iOiJtZW1lbWludC1jaGkudmVyY2VsLmFwcCJ9",
     signature:
-      "MHhjZDU3NDk3OWEzNDE1YTFiMWFlY2ZhMmZhOGYwYjIxYjQzNTAyYjIwYjdmZjEwYzI5MWJlYzUzZTVkMjJiOWNjNDY3Zjk2ZGQ3OWRhNjU2ZTIzZjlhY2Y4N2Y1ZGRmOWQwMDdjMzkyOWEzYzU2MjAyNjMwYjBmNWYzMzI5MWJhOTFi"
+      "ryYbA3uwYs1+xxB4I19HB/J5wgIv15/FRzhK+R329tBWI4LskyTfOPlGNqUTzuPk8TXe0H94X7tHOF2b4rypqRs="
   },
 
   baseBuilder: {
