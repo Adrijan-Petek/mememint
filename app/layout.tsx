@@ -34,17 +34,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <RootProvider>
-      <SplashScreenProvider>
-        <html lang="en" className="theme-dark" suppressHydrationWarning>
-          <head>
-            <meta name="base:app_id" content="68d0be1c1aaf9981934f89a8" />
-            <meta
-              name="talentapp:project_verification"
-              content="6ce2499a4805221f8a498bf2a01a258554515a2b5845adc2dc007c189d607d1222d5a5d7b3ecaa2d7179e16fd9da5a3a37efb316d8ebc42b5653b4b2fcd7c02d"
-            />
-          </head>
-          <body className={`${inter.variable} ${sourceCodePro.variable}`}>
+    <html lang="en" className="theme-dark" suppressHydrationWarning>
+      <head>
+        <meta name="base:app_id" content="68d0be1c1aaf9981934f89a8" />
+        <meta
+          name="talentapp:project_verification"
+          content="6ce2499a4805221f8a498bf2a01a258554515a2b5845adc2dc007c189d607d1222d5a5d7b3ecaa2d7179e16fd9da5a3a37efb316d8ebc42b5653b4b2fcd7c02d"
+        />
+      </head>
+      <body className={`${inter.variable} ${sourceCodePro.variable}`}>
+        <RootProvider>
+          <SplashScreenProvider>
             <Script id="mememint-theme-init" strategy="beforeInteractive">{`
 (() => {
   try {
@@ -62,9 +62,9 @@ export default function RootLayout({
               <NetworkChecker />
               <AppWrapper>{children}</AppWrapper>
             </ThemeProvider>
-          </body>
-        </html>
-      </SplashScreenProvider>
-    </RootProvider>
+          </SplashScreenProvider>
+        </RootProvider>
+      </body>
+    </html>
   );
 }
