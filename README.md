@@ -32,7 +32,7 @@ Mememint is a Farcaster Mini App for creating memes, tracking leaderboard points
 | NFT drops contract | Base | `0xB864e9BD48eCfAB4e320aCd448EBa3E10F5690d6` |
 | Treasury contract | Base | `0x4458bFdd688Df499Bc01e4E5890d0e9aA8aFa857` |
 | MemeBlastFees contract | Base | `0xda132daeD9D422b7A04978b4060F5bD4E27EcaF6` |
-| Frontend | Vercel | `https://mememint-one.vercel.app` |
+| Frontend | Vercel | `https://mememint-chi.vercel.app/` |
 
 ## Requirements
 
